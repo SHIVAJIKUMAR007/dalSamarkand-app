@@ -1,0 +1,146 @@
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StatusBar,
+  ImageBackground,
+  ScrollView,
+  BackHandler,
+  Alert,
+} from 'react-native';
+import InputBox from '../../../components/input-box';
+import styles from './style';
+import {COLORS} from '../../../constants/colors';
+import {IMAGES} from '../../../constants/images';
+import Feather from 'react-native-vector-icons/Feather';
+import {ICONS} from '../../../constants/icons';
+import ShadowBtn from '../../../components/shadow-btn';
+import {useGlobal} from 'reactn';
+import AsyncStorage from '@react-native-community/async-storage';
+import {axiosGet, axiosPost} from '../../../axios';
+import {useNavigation} from '@react-navigation/core';
+import axios from 'axios';
+import {serverEndPoint} from '../../../config';
+
+export default function SignIn(props) {
+  const [phoneNo, setPhoneNo] = useState('');
+  const [user, setuser] = useGlobal('user');
+  const [token, settoken] = useGlobal('jwtToken');
+  const [isSubmitting, setisSubmitting] = useState(false);
+  const navigation = useNavigation();
+
+  const onSubmit = async () => {
+    if (phoneNo?.length != 10) {
+      Alert.alert('Please Check', 'Mobile number must be of 10 digit.');
+      return false;
+    }
+    setisSubmitting(true);
+    // console.log(phoneNo);
+    try {
+      axiosPost(
+        'auth/login',
+        {phone: phoneNo},
+        response => {
+          Alert.alert('Success', response.message);
+          setisSubmitting(false);
+          navigation.navigate('OtpSignup', {
+            mobileNumber: phoneNo,
+            isLogin: true,
+          });
+        },
+        error => {
+          console.log(error.message, '====>58');
+          Alert.alert('Error', error?.message);
+        },
+        null,
+        navigation,
+        setuser,
+      );
+
+      // let res = await axios.get('https://api.dalsamarkand.com/');
+      // console.log(res.status, res.data);
+    } catch (error) {
+      setisSubmitting(false);
+
+      console.log(error, '====>59');
+      // for (let key in error) {
+      //   console.log(key, error[key]);
+      // }
+    }
+
+    setTimeout(() => {
+      setisSubmitting(false);
+    }, 3000);
+  };
+
+  return (
+    <ScrollView>
+      <View
+        colors={[COLORS.PRIMARY, COLORS.SECONDARY]}
+        style={styles.container}>
+        <StatusBar
+          translucent={true}
+          backgroundColor={'transparent'}
+          barStyle="light-content"
+        />
+
+        <ImageBackground source={IMAGES.AUTH_BG} style={styles.bg}>
+          <Image
+            source={ICONS.BORDER_BOTTOM_LEFT}
+            style={[styles.border, {bottom: 15, left: 15}]}
+          />
+          <Image
+            source={ICONS.BORDER_BOTTOM_RIGHT}
+            style={[styles.border, {bottom: 15, right: 15}]}
+          />
+          <Image
+            source={ICONS.BORDER_TOP_LEFT}
+            style={[styles.border, {top: 15, left: 15}]}
+          />
+          <Image
+            source={ICONS.BORDER_TOP_RIGHT}
+            style={[styles.border, {top: 15, right: 15}]}
+          />
+          <View style={styles.headingContainer}>
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <Feather name="chevron-left" color={COLORS.WHITE} size={24} />
+            </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <Text style={styles.heading}>Sign In/ Sign Up</Text>
+            </View>
+          </View>
+        </ImageBackground>
+
+        <View style={styles.bottomContainer}>
+          <InputBox
+            label="Mobile Number"
+            keyboardType="number-pad"
+            value={phoneNo}
+            placeholder="Mobile number"
+            maxLength={10}
+            onChangeText={text => setPhoneNo(text)}
+          />
+          <Text style={styles.tc}>
+            By signing in you agree to our terms & conditions
+          </Text>
+          <ShadowBtn
+            marginVertical={10}
+            isLoading={isSubmitting}
+            title="Proceed via OTP"
+            onPress={() => onSubmit()}
+          />
+
+          <View style={styles.row}>
+            <Text style={styles.tc2}>First Time ? </Text>
+            <TouchableOpacity
+              onPress={() => props.navigation.navigate('Signup')}>
+              <Text style={[styles.tc2, {color: 'yellow'}]}> Register</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
