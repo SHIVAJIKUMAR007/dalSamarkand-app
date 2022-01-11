@@ -6,6 +6,7 @@ import {
   ImageBackground,
   ScrollView,
   Pressable,
+  BackHandler,
 } from 'react-native';
 import styles from './style';
 import {ICONS} from '../../../constants/icons';
@@ -75,11 +76,24 @@ export default function HomeScreen(props) {
     );
     checkAuthData(isMounted);
 
+    //this is for exit app at home event listner
+    let backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      function () {
+        BackHandler.exitApp();
+      },
+    );
+    // this is for remove event listner when home page is blured,
+    // means go down in navigation stack
+    navigation.addListener('blur', () => {
+      backHandler.remove();
+    });
     return () => {
       isMounted = false;
       setproducts([]);
+      backHandler.remove();
     };
-  }, []);
+  }, [navigation]);
   return (
     <ScrollView style={styles.container} ref={scrollViewRef}>
       <ImageBackground

@@ -131,7 +131,9 @@ export default function ProductDetails(props) {
               </Text>
               <Text style={styles.productName}>{product?.title}</Text>
               <Text style={styles.productPrice}>Rs. {product?.sale_price}</Text>
-              <Text style={styles.productMrp}>Rs. {product?.mrp}</Text>
+              {product?.mrp > product?.sale_price ? (
+                <Text style={styles.productMrp}>Rs. {product?.mrp}</Text>
+              ) : null}
 
               <View style={{flexDirection: 'row'}}>
                 {isPresentInCart ? (

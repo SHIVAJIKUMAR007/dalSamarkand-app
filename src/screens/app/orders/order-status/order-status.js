@@ -14,9 +14,11 @@ import {ICONS} from '../../../../constants/icons';
 import {COLORS} from '../../../../constants/colors';
 import {ScrollView} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {IMAGES} from '../../../../constants/images';
 import {useGlobal} from 'reactn';
 import {axiosGet} from '../../../../axios';
+import {FONT_FAMILY} from '../../../../constants/font-family';
 
 const {height} = Dimensions.get('window');
 
@@ -28,7 +30,7 @@ export default function OrderStatus(props) {
     axiosGet(
       'order/' + orderId,
       data => {
-        console.log(data);
+        // console.log(data);
         setorderDetail(data);
       },
       res => console.log(res),
@@ -135,6 +137,7 @@ export default function OrderStatus(props) {
             ))}
           </View>
         </View>
+        <RatingSystem order={orderDetail} />
       </ScrollView>
       <View style={{padding: 25, backgroundColor: COLORS.WHITE}}>
         <BrownBtn
@@ -147,3 +150,67 @@ export default function OrderStatus(props) {
     </>
   );
 }
+
+const RatingSystem = ({order}) => {
+  const [rating, setrating] = useState(null);
+
+  return (
+    <>
+      <Text style={[styles.heading, {marginHorizontal: 30, marginTop: 10}]}>
+        Rate Us
+      </Text>
+
+      <View style={styles.ratingBorderView}>
+        <Text
+          style={{
+            fontFamily: FONT_FAMILY.baskervilleOldFace,
+            fontSize: 13,
+          }}>
+          Rate your Experience
+        </Text>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            onPress={() => setrating(pre => (pre == 1 ? null : 1))}>
+            {rating && rating >= 1 ? (
+              <Entypo name="star" size={25} color={COLORS.YELLOW} />
+            ) : (
+              <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setrating(pre => (pre == 2 ? null : 2))}>
+            {rating && rating >= 2 ? (
+              <Entypo name="star" size={25} color={COLORS.YELLOW} />
+            ) : (
+              <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setrating(pre => (pre == 3 ? null : 3))}>
+            {rating && rating >= 3 ? (
+              <Entypo name="star" size={25} color={COLORS.YELLOW} />
+            ) : (
+              <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setrating(pre => (pre == 4 ? null : 4))}>
+            {rating && rating >= 4 ? (
+              <Entypo name="star" size={25} color={COLORS.YELLOW} />
+            ) : (
+              <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setrating(pre => (pre == 5 ? null : 5))}>
+            {rating && rating >= 5 ? (
+              <Entypo name="star" size={25} color={COLORS.YELLOW} />
+            ) : (
+              <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
+};

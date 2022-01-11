@@ -13,19 +13,20 @@ export default function BrownBtn(props) {
         paddingHorizontal: 20,
       }}>
       <TouchableOpacity
-        disabled={props.disabled}
-        style={styles.btnShadow}
+        disabled={props.disabled || props.isLoading}
+        style={[
+          styles.btnShadow,
+          {
+            backgroundColor: props.disabled
+              ? COLORS.LIGHT_GREY
+              : COLORS.PRIMARY_LIGHT,
+          },
+        ]}
         onPress={props.onPress}>
         {props.isLoading ? (
           <ActivityIndicator size="small" color={COLORS.WHITE} />
         ) : (
-          <Text style={styles.btnTxt}>
-            {props.disabled ? (
-              <ActivityIndicator size="small" color={COLORS.WHITE} />
-            ) : (
-              props.title
-            )}
-          </Text>
+          <Text style={styles.btnTxt}>{props.title}</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -34,7 +35,7 @@ export default function BrownBtn(props) {
 
 const styles = StyleSheet.create({
   btnShadow: {
-    backgroundColor: COLORS.PRIMARY_LIGHT,
+    // backgroundColor: COLORS.PRIMARY_LIGHT,
     elevation: 1,
     borderRadius: 10,
     height: 58,

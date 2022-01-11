@@ -50,6 +50,14 @@ function CustomDrawerContent({navigation}) {
         {user ? (
           <>
             <DrawerList
+              // icon={ICONS.OFFER}
+              iconRNVI={
+                <MaterialIcons name="home" size={20} color={COLORS.WHITE} />
+              }
+              title={'Home'}
+              onPress={() => navigation.navigate('Home')}
+            />
+            <DrawerList
               // icon={ICONS.PROFILE}
               iconRNVI={
                 <FontAwesome
@@ -66,7 +74,7 @@ function CustomDrawerContent({navigation}) {
               title={'Orders'}
               onPress={() => navigation.navigate('Orders')}
             />
-            <DrawerList
+            {/* <DrawerList
               // icon={ICONS.OFFER}
               iconRNVI={
                 <MaterialIcons
@@ -76,11 +84,10 @@ function CustomDrawerContent({navigation}) {
                 />
               }
               title={'Offer & Promo'}
-              onPress={() => navigation.navigate('Orders')}
-            />
+              onPress={() => navigation.navigate('Offers')}
+            /> */}
 
             <DrawerList
-              // icon={ICONS.HISTORY}
               iconRNVI={
                 <Ionicons name="notifications" size={20} color={COLORS.WHITE} />
               }

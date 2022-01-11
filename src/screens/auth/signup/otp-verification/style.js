@@ -7,6 +7,7 @@ var {width, height} = Dimensions.get('window');
 export default StyleSheet.create({
   container: {
     backgroundColor: COLORS.WHITE,
+    minHeight: height * 0.9,
     flex: 1,
     justifyContent: 'space-between',
   },

@@ -10,13 +10,18 @@ export default function GreyInputBox(props) {
         <TextInput
           {...props}
           placeholder={props.placeholder}
-          placeholderTextColor="#696969"
-          style={[styles.input, props.style]}
+          // placeholderTextColor="#696969"
+          style={[
+            styles.input,
+            props.style,
+            {color: props.editable != false ? 'black' : 'rgba(0,0,0,0.6)'},
+          ]}
           keyboardType={props.keyboardType}
           secureTextEntry={props.secureTextEntry}
           defaultValue={props.defaultValue}
           onChangeText={props.onChangeText}
           editable={props.editable}
+          placeholderTextColor="rgba(0,0,0,0.5)"
         />
       </View>
     </>
@@ -32,11 +37,11 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.bellefair,
     fontSize: 14,
     height: 45,
-    color: COLORS.BLACK,
+    // color: COLORS.BLACK,
     letterSpacing: 0.5,
     backgroundColor: '#F2F2F2',
     borderRadius: 10,
     paddingHorizontal: 15,
-    flex: 1,
+    // flex: 1,
   },
 });

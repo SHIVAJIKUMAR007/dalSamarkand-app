@@ -36,7 +36,23 @@ export default function SignupForm(props) {
   });
 
   const [isSubmitting, setisSubmitting] = useState(false);
+  const [isValidForm, setisValidForm] = useState(false);
+  function validateFormConti(registerData) {
+    let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (
+      !registerData?.email.match(validEmailType) ||
+      !registerData?.name ||
+      registerData?.phone.length != 10
+    ) {
+      console.log('no');
 
+      setisValidForm(false);
+      return;
+    }
+    console.log('yes');
+    setisValidForm(true);
+    return;
+  }
   function validateForm() {
     if (registerData?.name == '') {
       Alert.alert('Please Check', 'Name field is required.');
@@ -83,15 +99,25 @@ export default function SignupForm(props) {
           });
         },
         res => {
+          // console.log(res, 'status 0');
           Alert.alert('Error', res?.message);
         },
-        null,
+        res => {
+          // console.log(res);
+          let error = res?.err?.keyValue;
+          let errStr = '';
+          for (let key in error) {
+            errStr += `${error[key]} is duplicate`;
+          }
+          Alert.alert('Error', errStr);
+        },
         navigation,
         setuser,
       );
     } catch (error) {
       setisSubmitting(false);
-      console.log(error);
+      // console.log(error);
+      Alert.alert('Error', error.message);
     }
     setTimeout(() => {
       setisSubmitting(false);
@@ -116,7 +142,7 @@ export default function SignupForm(props) {
       }
       Alert.alert(
         'Tracking permission required',
-        'You need to give tracking permission to signup to AIBA.',
+        'You need to give tracking permission to signup to Dal Samarkand.',
       );
     } catch (error) {
       console.log(error);
@@ -168,7 +194,9 @@ export default function SignupForm(props) {
             value={registerData?.name}
             onChangeText={text =>
               setregisterData(pre => {
-                return {...pre, name: text};
+                pre = {...pre, name: text};
+                validateFormConti(pre);
+                return pre;
               })
             }
             placeholder="Name"
@@ -181,7 +209,9 @@ export default function SignupForm(props) {
             onChangeText={text => {
               // text = text.toLowerCase();
               setregisterData(pre => {
-                return {...pre, email: text};
+                pre = {...pre, email: text};
+                validateFormConti(pre);
+                return pre;
               });
             }}
             borderBlack
@@ -194,10 +224,13 @@ export default function SignupForm(props) {
             value={registerData?.phone}
             onChangeText={text =>
               setregisterData(pre => {
-                return {...pre, phone: text};
+                pre = {...pre, phone: text};
+                validateFormConti(pre);
+                return pre;
               })
             }
             borderBlack
+            instruction="Mobile number must be of 10 digits."
           />
           {/* accept terms and conditions  */}
           <View
@@ -228,7 +261,8 @@ export default function SignupForm(props) {
 
           <BrownBtn
             marginVertical={10}
-            disabled={isSubmitting}
+            disabled={!isValidForm}
+            isLoading={isSubmitting}
             title="Register"
             onPress={() => onSubmit()}
           />

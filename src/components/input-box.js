@@ -39,6 +39,13 @@ export default function InputBox(props) {
       color: props.borderBlack ? COLORS.BLACK : COLORS.WHITE,
       fontSize: 12,
     },
+    instruction: {
+      fontSize: 10,
+
+      color: props.borderBlack ? COLORS.BLACK : COLORS.WHITE,
+      marginVertical: 4,
+      marginLeft: 5,
+    },
   };
   return (
     <>
@@ -63,42 +70,10 @@ export default function InputBox(props) {
           <View style={styles.bottomBorder} />
           <View style={styles.dot} />
         </View>
+        {props.instruction ? (
+          <Text style={styles.instruction}>{props.instruction}</Text>
+        ) : null}
       </View>
     </>
   );
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     marginBottom: 20,
-//   },
-
-//   bottomBorder: {
-//     borderStyle: 'dashed',
-//     borderWidth: 0.5,
-//     borderRadius: 1,
-//     borderColor: COLORS.WHITE,
-//     flex: 1,
-//     marginHorizontal: 2.5,
-//   },
-
-//   dot: {
-//     height: 4,
-//     width: 4,
-//     backgroundColor: COLORS.WHITE,
-//     borderRadius: 4,
-//   },
-
-//   input: {
-//     fontFamily: FONT_FAMILY.bellefair,
-//     fontSize: 14,
-//     height: 37,
-//     color: COLORS.WHITE,
-//     letterSpacing: 1.5,
-//   },
-//   label: {
-//     fontFamily: FONT_FAMILY.bellefair,
-//     color: COLORS.WHITE,
-//     fontSize: 12,
-//   },
-// });

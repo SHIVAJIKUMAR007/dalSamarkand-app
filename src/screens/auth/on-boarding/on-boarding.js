@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   ActivityIndicator,
+  BackHandler,
 } from 'react-native';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import {IMAGES} from '../../../constants/images';
@@ -14,6 +15,8 @@ import styles from './style';
 import {COLORS} from '../../../constants/colors';
 
 import Feather from 'react-native-vector-icons/Feather';
+import AsyncStorage from '@react-native-community/async-storage';
+import {firstTimeThreeScreen} from '../../../constants/appConstant';
 
 const slides = [
   {

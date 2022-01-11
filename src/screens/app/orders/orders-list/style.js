@@ -61,4 +61,40 @@ export default StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
   },
+
+  activeCircle: {
+    height: 30,
+    width: 30,
+    backgroundColor: COLORS.PRIMARY_LIGHT,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  circle: {
+    height: 30,
+    width: 30,
+    backgroundColor: COLORS.LIGHT_GREY,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  stepperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  stepperCompletedLine: {
+    height: 2,
+    flex: 1,
+    backgroundColor: COLORS.PRIMARY_LIGHT,
+  },
+
+  stepperLine: {
+    height: 2,
+    flex: 1,
+    backgroundColor: COLORS.LIGHT_GREY,
+  },
 });

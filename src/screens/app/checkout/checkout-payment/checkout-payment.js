@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
   View,
-  StatusBar,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -19,6 +18,7 @@ import {appLogo, appName} from '../../../../constants/appConstant';
 import {COLORS} from '../../../../constants/colors';
 import GreyInputBox from '../../../../components/grey-input-box';
 import AlertMsg from '../../../../components/alert-msg';
+import AllInOneSDKManager from 'paytm_allinone_react-native';
 
 const {width} = Dimensions.get('window');
 export default function CheckoutPayment(props) {
@@ -86,6 +86,13 @@ export default function CheckoutPayment(props) {
     );
   }
   async function handleOrder() {
+    if (orderDetail?.payment_type == 'paytm') {
+      Alert.alert(
+        '',
+        'Paytm is not available as of now, we are tring to add it.',
+      );
+      return;
+    }
     try {
       setisSubmitting(true);
       axiosPost(
@@ -109,7 +116,7 @@ export default function CheckoutPayment(props) {
               .then(data => {
                 // handle success
 
-                alert(`Success: ${data.razorpay_payment_id}`);
+                alert(`Success`, 'Your payment is successfully done.');
 
                 setisSubmitting(false);
                 props.navigation.navigate('ThankYou');
@@ -125,6 +132,9 @@ export default function CheckoutPayment(props) {
             // Alert.alert('Success', data?.message);
             setisSubmitting(false);
             props.navigation.navigate('ThankYou');
+          }
+          //////////else if paytm
+          else if (orderDetail?.payment_type == 'paytm') {
           }
         },
         res => {
@@ -148,11 +158,6 @@ export default function CheckoutPayment(props) {
   }
   return (
     <View style={styles.topBg}>
-      <StatusBar
-        translucent={true}
-        backgroundColor={'transparent'}
-        barStyle="dark-content"
-      />
       <ScrollView style={styles.container}>
         <CustomHeader title="Checkout" />
         <View style={{paddingHorizontal: 20}}>
@@ -160,7 +165,7 @@ export default function CheckoutPayment(props) {
           <Text style={styles.subHeading}>
             All transactions are secure and encrypted.
           </Text>
-
+          {/* razor pay  */}
           <View style={styles.card}>
             <TouchableOpacity
               onPress={() => {
@@ -183,6 +188,29 @@ export default function CheckoutPayment(props) {
                 After clicking “Complete order”, you will be redirected to
                 Razorpay (Cards, UPI, NetBanking, Wallets) to complete your
                 purchase securely.
+              </Text>
+            </View>
+          </View>
+          {/* paytm  */}
+          <View style={styles.card}>
+            <TouchableOpacity
+              onPress={() => {
+                setorderDetail(pre => {
+                  return {...pre, payment_type: 'paytm'};
+                });
+              }}>
+              <View style={styles.circle}>
+                {orderDetail?.payment_type == 'paytm' && (
+                  <View style={styles.activeCircle} />
+                )}
+              </View>
+            </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <Text style={styles.name}>Paytm</Text>
+
+              <Text style={styles.otherInfo}>
+                After clicking “Complete order”, you will be redirected to Paytm
+                app to complete your purchase securely.
               </Text>
             </View>
           </View>
@@ -242,8 +270,10 @@ export default function CheckoutPayment(props) {
             <View style={styles.totalContainer}>
               <Text style={styles.devCharges}>Delivery Charges</Text>
               <Text style={styles.devTotal}>
-                {'+    '}Rs.{' '}
-                {checkout?.deleveryCharge ? checkout?.deleveryCharge : 0}
+                Rs.{' '}
+                {checkout?.delivery_charges
+                  ? checkout?.delivery_charges
+                  : 'Free'}
               </Text>
             </View>
             <View style={{marginVertical: 2}} />
@@ -252,9 +282,9 @@ export default function CheckoutPayment(props) {
                 Discount{' '}
                 {discount?.value
                   ? `(${orderDetail?.coupon} applied ${
-                      discount?.type == 'amount' ? '- Rs ' : null
+                      discount?.type == 'amount' ? '- Rs ' : ''
                     } ${discount?.value}${
-                      discount?.type == 'amount' ? null : '%'
+                      discount?.type == 'amount' ? '' : '%'
                     })`
                   : '( No coupon applied )'}
               </Text>

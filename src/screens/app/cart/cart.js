@@ -30,6 +30,7 @@ export default function Cart(props) {
   const [totalPrice, settotalPrice] = useState(0);
   const [checkout, setcheckout] = useState(null);
   const [isLoading, setisLoading] = useState(false);
+  const [isUpdatingCart, setisUpdatingCart] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -80,14 +81,14 @@ export default function Cart(props) {
             <Text style={styles.heading}>swipe on an item to delete</Text>
           </View> */}
           <FlatList
-            data={cart}
+            data={checkout?.items}
             renderItem={item => (
               <CartItem
                 key={item?.index}
                 data={item?.item}
                 navigation={props.navigation}
-                settotalPrice={settotalPrice}
-                setisCartLoading={setisLoading}
+                setisCartLoading={setisUpdatingCart}
+                setcheckout={setcheckout}
               />
             )}
           />
@@ -100,13 +101,18 @@ export default function Cart(props) {
 
             <View style={styles.totalContainer}>
               <Text style={styles.subTotalHeading}>Subtotal</Text>
-              <Text style={styles.subTotal}>Rs. {totalPrice}</Text>
+              {isUpdatingCart ? (
+                <ActivityIndicator color={COLORS.PRIMARY_LIGHT} />
+              ) : (
+                <Text style={styles.subTotal}>Rs. {checkout?.subTotal}</Text>
+              )}
             </View>
             <Text style={styles.subHeading}>
               Taxes and shipping calculated at checkout page
             </Text>
             <BrownBtn
               title="Complete order"
+              disabled={isUpdatingCart}
               onPress={() =>
                 props.navigation.navigate('CheckoutDelivery', {
                   checkout: checkout,
@@ -128,7 +134,7 @@ export default function Cart(props) {
   );
 }
 
-const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
+const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
   const [cart, setcart] = useGlobal('cart');
   const [user, setuser] = useGlobal('user');
   const [isLoading, setisLoading] = useState(false);
@@ -160,6 +166,7 @@ const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
               setuser,
               settotalPrice,
               cartItem?.title,
+              setisCartLoading,
             );
           },
         },
@@ -167,12 +174,14 @@ const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
           text: 'No',
           onPress: async () => {
             setqty(data?.quantity);
+            setisCartLoading(false);
           },
         },
       ],
     );
   };
   const updateQuantity = (addMore, qty) => {
+    setisCartLoading(true);
     window.clearTimeout(killTimeout);
     if (!addMore && qty <= 1) {
       removeItem();
@@ -180,16 +189,14 @@ const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
     }
     setkillTimeout(
       window.setTimeout(() => {
-        console.log('intimeout');
         updateItemInCart(
           cartItem?._id,
           addMore ? qty + 1 : qty - 1,
-          setcart,
-          settotalPrice,
           navigation,
           setuser,
           setisLoading,
-          cartItem?.title,
+          setcheckout,
+          setisCartLoading,
         );
       }, 700),
     );
@@ -202,13 +209,24 @@ const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
           <Image style={styles.productImage} source={IMAGES.PRODUCT} />
         </View>
         <View style={styles.productInfoContainer}>
-          <TouchableOpacity
-            style={{marginLeft: 'auto'}}
-            onPress={() => removeItem()}>
-            <MaterialIcons name="delete-forever" size={25} color={COLORS.RED} />
-          </TouchableOpacity>
           <View style={styles.qtyBtnContainer}>
-            <Text style={styles.productName}>{cartItem?.title}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('ProductDetails', {
+                  productId: cartItem?._id,
+                });
+              }}>
+              <Text style={styles.productName}>{cartItem?.title}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              // style={{marginLeft: 'auto'}}
+              onPress={() => removeItem()}>
+              <MaterialIcons
+                name="delete-forever"
+                size={25}
+                color={COLORS.RED}
+              />
+            </TouchableOpacity>
           </View>
           <View style={styles.qtyBtnContainer}>
             <Text style={styles.productPrice}>Rs. {cartItem?.sale_price}</Text>
@@ -216,7 +234,7 @@ const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
             <View style={styles.btnContainer}>
               <TouchableOpacity
                 style={styles.qtyBtn}
-                disabled={isLoading}
+                // disabled={isLoading}
                 onPress={() => {
                   if (qty <= 0) return;
                   updateQuantity(false, qty);
@@ -229,7 +247,7 @@ const CartItem = ({data, navigation, settotalPrice, setisCartLoading}) => {
               </View>
               <TouchableOpacity
                 style={styles.qtyBtn}
-                disabled={isLoading}
+                // disabled={isLoading}
                 onPress={() => {
                   updateQuantity(true, qty);
                   setqty(pre => pre + 1);

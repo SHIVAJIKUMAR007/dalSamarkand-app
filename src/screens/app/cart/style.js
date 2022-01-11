@@ -101,12 +101,13 @@ export default StyleSheet.create({
   qtyBtnContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
 
   productImage: {
     height: 80,
     width: 85,
+    borderRadius: 10,
   },
 
   productInfo: {

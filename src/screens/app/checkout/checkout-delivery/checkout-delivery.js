@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  TextInput,
 } from 'react-native';
 import styles from './style';
 import CustomHeader from '../../../../components/custom-header';
@@ -19,6 +20,8 @@ import {useGlobal} from 'reactn';
 import AsyncStorage from '@react-native-community/async-storage';
 import AlertMsg from '../../../../components/alert-msg';
 import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
+import {FONT_FAMILY} from '../../../../constants/font-family';
+import {COLORS} from '../../../../constants/colors';
 
 export default function CheckoutDelivery(props) {
   const [dod, setDod] = useState(moment().format('dddd, LL'));
@@ -62,7 +65,7 @@ export default function CheckoutDelivery(props) {
     axiosGet(
       'address',
       data => {
-        console.log(data, ' =========> 59');
+        // console.log(data, ' =========> 59');
         setallAddress(data?.items);
       },
       res => console.log(res),
@@ -70,6 +73,7 @@ export default function CheckoutDelivery(props) {
       setuser,
     );
     setcheckout(props?.route?.params?.checkout);
+    // console.log(props?.route?.params?.checkout);
     return () => {
       setallAddress([]);
       setcheckout(null);
@@ -264,8 +268,10 @@ export default function CheckoutDelivery(props) {
               <View style={styles.totalContainer}>
                 <Text style={styles.devCharges}>Delivery Charges</Text>
                 <Text style={styles.devTotal}>
-                  {'+    '}Rs.{' '}
-                  {checkout?.deleveryCharge ? checkout?.deleveryCharge : 0}
+                  Rs.{' '}
+                  {checkout?.delivery_charges
+                    ? checkout?.delivery_charges
+                    : 'Free'}
                 </Text>
               </View>
             </View>
@@ -491,6 +497,7 @@ const AddressModal = ({
                 }}
                 placeholder="Name"
               />
+
               <GreyInputBox
                 value={addressData?.address}
                 onChangeText={val => {

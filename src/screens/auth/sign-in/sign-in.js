@@ -29,6 +29,7 @@ export default function SignIn(props) {
   const [user, setuser] = useGlobal('user');
   const [token, settoken] = useGlobal('jwtToken');
   const [isSubmitting, setisSubmitting] = useState(false);
+
   const navigation = useNavigation();
 
   const onSubmit = async () => {
@@ -115,18 +116,20 @@ export default function SignIn(props) {
 
         <View style={styles.bottomContainer}>
           <InputBox
-            label="Mobile Number"
+            // label="Mobile Number"
             keyboardType="number-pad"
             value={phoneNo}
             placeholder="Mobile number"
             maxLength={10}
             onChangeText={text => setPhoneNo(text)}
+            instruction="Mobile number must be of 10 digits."
           />
           <Text style={styles.tc}>
             By signing in you agree to our terms & conditions
           </Text>
           <ShadowBtn
             marginVertical={10}
+            disabled={phoneNo.length < 10 ? true : false}
             isLoading={isSubmitting}
             title="Proceed via OTP"
             onPress={() => onSubmit()}

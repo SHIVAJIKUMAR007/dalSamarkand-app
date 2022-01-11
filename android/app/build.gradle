@@ -197,7 +197,11 @@ dependencies {
 
     /////////  google tag manager ////////////
     implementation 'com.google.android.gms:play-services-tagmanager:17.0.0'
-
+    ///////// paytm all in one sdk //////////////////////
+    implementation "com.squareup.okhttp3:okhttp:4.2.1"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.2.1"
+    implementation "com.squareup.okhttp3:okhttp-urlconnection:4.2.1"
+    ///////// paytm all in one sdk //////////////////////
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'

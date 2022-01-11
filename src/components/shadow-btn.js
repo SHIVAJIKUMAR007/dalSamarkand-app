@@ -8,9 +8,16 @@ export default function ShadowBtn(props) {
   return (
     <View style={{marginVertical: props.marginVertical, zIndex: 0}}>
       <TouchableOpacity
-        style={styles.btnShadow}
+        style={[
+          styles.btnShadow,
+          {
+            backgroundColor: props.disabled
+              ? COLORS.LIGHT_GREY
+              : COLORS.SECONDARY,
+          },
+        ]}
         onPress={props.onPress}
-        disabled={props?.isLoading}>
+        disabled={props.disabled || props?.isLoading}>
         {props.isLoading ? (
           <ActivityIndicator size="small" color={COLORS.WHITE} />
         ) : (
@@ -23,7 +30,7 @@ export default function ShadowBtn(props) {
 
 const styles = StyleSheet.create({
   btnShadow: {
-    backgroundColor: COLORS.SECONDARY,
+    // backgroundColor: COLORS.SECONDARY,
     elevation: 1,
     borderRadius: 10,
     height: 58,

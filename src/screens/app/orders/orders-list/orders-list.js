@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import CustomHeader from '../../../../components/custom-header';
 import styles from './style';
@@ -18,19 +19,20 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {COLORS} from '../../../../constants/colors';
 import {FONT_FAMILY} from '../../../../constants/font-family';
 import {ActivityIndicator} from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 
 const {height} = Dimensions.get('window');
 export default function OrdersList(props) {
   const [allOrders, setallOrders] = useState([]);
   const [isLoading, setisLoading] = useState(false);
+  const [isRefreshing, setisRefreshing] = useState(false);
   const [user, setuser] = useGlobal('user');
-  useEffect(() => {
+  const getOrders = () => {
     setisLoading(true);
     axiosGet(
       'order',
       data => {
         setisLoading(false);
-        // console.log(data);
         setallOrders(data);
       },
       res => console.log(res),
@@ -40,10 +42,18 @@ export default function OrdersList(props) {
     setTimeout(() => {
       setisLoading(false);
     }, 5000);
+  };
+  useEffect(() => {
+    getOrders();
     return () => {
       setallOrders([]);
     };
   }, []);
+  const _onRefresh = () => {
+    // setisRefreshing(true)
+    console.log('_onRefresh');
+    getOrders();
+  };
   return (
     <View style={styles.container}>
       <StatusBar
@@ -65,10 +75,18 @@ export default function OrdersList(props) {
         <>
           <FlatList
             data={allOrders}
+            // onRefresh={_onRefresh}
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={_onRefresh}
+                tintColor={COLORS.PRIMARY}
+              />
+            }
             renderItem={(item, i) => (
               <OneOrder
                 item={item?.item}
-                key={i}
+                key={item?.index}
                 navigation={props.navigation}
               />
             )}
@@ -97,7 +115,7 @@ export default function OrdersList(props) {
 }
 
 function OneOrder({item, navigation}) {
-  console.log(item);
+  // console.log(item);
   // const {navigation} = useNavigationState();
   return (
     <>
@@ -169,7 +187,8 @@ function OneOrder({item, navigation}) {
           We will process your order witthin 12-24 hours. Once processed we will
           update the Estimated Delivery Date and Time.
         </Text>
-        <RatingSystem order={item} />
+        {/* <RatingSystem order={item} /> */}
+        <StepedTrack />
       </View>
     </>
   );
@@ -232,5 +251,21 @@ const RatingSystem = ({order}) => {
         </View>
       </View>
     </>
+  );
+};
+
+const StepedTrack = () => {
+  return (
+    <View style={styles.stepperContainer}>
+      <View style={styles.activeCircle}>
+        <Feather name="check" color={COLORS.WHITE} size={20} />
+      </View>
+      <View style={styles.stepperCompletedLine} />
+      <View style={styles.activeCircle}>
+        <Feather name="check" color={COLORS.WHITE} size={20} />
+      </View>
+      <View style={styles.stepperLine} />
+      <View style={styles.circle}></View>
+    </View>
   );
 };

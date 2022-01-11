@@ -56,7 +56,7 @@ async function axiosPost(
       })
       .then(res => res.data)
       .then(response => {
-        // console.log(response, '========>res');
+        console.log(response, '========>res');
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response);
@@ -114,7 +114,7 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
       })
       .then(res => res.data)
       .then(response => {
-        console.log(response);
+        // console.log(response);
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response?.error);

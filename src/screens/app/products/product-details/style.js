@@ -40,6 +40,7 @@ export default StyleSheet.create({
     fontFamily: FONT_FAMILY.baskervilleOldFace,
     color: COLORS.PRIMARY_LIGHT,
     marginTop: 20,
+    marginBottom: 10,
     textAlign: 'center',
   },
   productMrp: {
@@ -48,7 +49,7 @@ export default StyleSheet.create({
     color: COLORS.PRIMARY_LIGHT,
     textAlign: 'center',
     textDecorationLine: 'line-through',
-    marginVertical: 5,
+    marginVertical: 8,
   },
 
   btnContainer: {

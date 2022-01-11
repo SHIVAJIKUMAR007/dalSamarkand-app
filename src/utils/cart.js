@@ -77,6 +77,7 @@ export const removeFromCart = async (
   setuser,
   settotalPrice,
   itemName,
+  setisCartLoading,
 ) => {
   try {
     // const startTime = Date.now();
@@ -87,7 +88,7 @@ export const removeFromCart = async (
       'cart',
       form,
       async data => {
-        AlertMsg(itemName + ' removed from the cart.');
+        // AlertMsg(itemName + ' removed from the cart.');
         // const endtime = Date.now();
         // console.log(
         //   endtime - startTime,
@@ -96,6 +97,8 @@ export const removeFromCart = async (
         // console.log(data?.items);
         setcart(data?.items);
         settotalPrice(data?.subTotal);
+        setisCartLoading(false);
+
         return true;
       },
       null,
@@ -106,6 +109,8 @@ export const removeFromCart = async (
   } catch (error) {
     console.log(error);
     AlertMsg('Error occured' + error);
+    setisCartLoading(false);
+
     return false;
   }
 };
@@ -113,12 +118,11 @@ export const removeFromCart = async (
 export const updateItemInCart = async (
   itemId,
   qty,
-  setcart,
-  settotalPrice,
   navigation,
   setuser,
   setisLoading,
-  itemName,
+  setcheckout,
+  setisCartLoading,
 ) => {
   let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
 
@@ -132,33 +136,38 @@ export const updateItemInCart = async (
         Authorization: token,
       },
     });
-    updateData = updateData?.data;
+    updateData = await updateData?.data;
 
     if (updateData?.status_code == 1) {
       updateData = updateData?.data;
-      AlertMsg(
-        qty
-          ? itemName + ' quantity updated to ' + qty
-          : itemName + ' removed from the cart.',
-      );
+      // AlertMsg(
+      //   qty
+      //     ? itemName + ' quantity updated to ' + qty
+      //     : itemName + ' removed from the cart.',
+      // );
       // const endtime = Date.now();
       // console.log(
       //   endtime - startTime,
       //   'time taken to get response from update cart time api',
       // );
-      setcart(updateData?.items);
-      settotalPrice(updateData?.subTotal);
+      // setcart(updateData?.items);
+      setcheckout(updateData);
+      // settotalPrice(updateData?.subTotal);
 
       setisLoading(false);
+      setisCartLoading(false);
+
       return true;
     } else {
       AlertMsg('Error ' + updateData?.message);
       console.log(updateData);
     }
+    setisCartLoading(false);
   } catch (error) {
     console.log(error);
     AlertMsg('Error occured' + error);
     setisLoading(false);
+    setisCartLoading(false);
     return false;
   }
 };

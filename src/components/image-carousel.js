@@ -23,6 +23,7 @@ export default function ImageCarousel(props) {
       autoplay={true}
       loop={true}
       inactiveSlideOpacity={0}
+      lockScrollTimeoutDuration={300}
     />
   );
 }
@@ -36,14 +37,11 @@ const RenderItem = ({item, banner}) => {
           style={styles.image}
         />
       </View>
-      <View style={styles.dotContainer}>
+      {/* <View style={styles.dotContainer}>
         {banner.map((data, i) => (
-          <View
-            style={item.id === i + 1 ? styles.activeDot : styles.dot}
-            key={i}
-          />
+          <View style={item.id === i ? styles.activeDot : styles.dot} key={i} />
         ))}
-      </View>
+      </View> */}
     </>
   );
 };
@@ -67,10 +65,10 @@ const styles = StyleSheet.create({
   },
 
   activeDot: {
-    width: 7,
-    height: 7,
+    width: 10,
+    height: 10,
     backgroundColor: COLORS.PRIMARY,
-    borderRadius: 7,
+    borderRadius: 10,
     margin: 2,
   },
 
@@ -80,7 +78,7 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     margin: 2,
     borderWidth: 1.5,
-    borderColor: COLORS.PRIMARY,
+    borderColor: COLORS.PRIMARY_LIGHT,
   },
 
   dotContainer: {

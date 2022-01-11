@@ -97,12 +97,13 @@ export default function EditProfile(props) {
             placeholder="Name"
           />
           <GreyInputBox
-            value={editedData?.phone.toString()}
-            onChangeText={val =>
-              seteditedData(pre => {
-                return {...pre, phone: val};
-              })
-            }
+            value={editedData?.phone?.toString()}
+            // onChangeText={val =>
+            //   seteditedData(pre => {
+            //     return {...pre, phone: val};
+            //   })
+            // }
+            editable={false}
             placeholder="Phone Number"
             keyboardType="numeric"
             maxLength={10}

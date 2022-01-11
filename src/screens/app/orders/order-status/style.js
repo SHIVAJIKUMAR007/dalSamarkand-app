@@ -147,4 +147,18 @@ export default StyleSheet.create({
     borderRadius: 5,
     elevation: 3,
   },
+  ratingBorderView: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: COLORS.BLACK,
+    // height: 40,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // flex: 1,
+    flexDirection: 'row',
+    marginHorizontal: 25,
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    // paddingBottom: 30,
+    borderRadius: 5,
+  },
 });

@@ -23,6 +23,7 @@ import TermsServices from '../screens/app/policies/terms-of-services/terms-servi
 import SignIn from '../screens/auth/sign-in/sign-in';
 import OtpVerification from '../screens/auth/otp-verification/otp-verification';
 import OtpVerificationSignup from '../screens/auth/signup/otp-verification/OtpVarification';
+import Offers from '../screens/app/offers/Offers';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,8 @@ export default function HomeNavigator() {
       <Stack.Screen name="ProductList" component={ProductList} />
       <Stack.Screen name="ProductDetails" component={ProductDetails} />
       <Stack.Screen name="Cart" component={Cart} />
+      <Stack.Screen name="Offers" component={Offers} />
+
       <Stack.Screen name="CheckoutAddress" component={CheckoutAddress} />
       <Stack.Screen name="CheckoutDelivery" component={CheckoutDelivery} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
