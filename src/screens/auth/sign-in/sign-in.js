@@ -18,11 +18,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import {ICONS} from '../../../constants/icons';
 import ShadowBtn from '../../../components/shadow-btn';
 import {useGlobal} from 'reactn';
-import AsyncStorage from '@react-native-community/async-storage';
-import {axiosGet, axiosPost} from '../../../axios';
+import {axiosPost} from '../../../axios';
 import {useNavigation} from '@react-navigation/core';
-import axios from 'axios';
-import {serverEndPoint} from '../../../config';
 
 export default function SignIn(props) {
   const [phoneNo, setPhoneNo] = useState('');
@@ -39,10 +36,13 @@ export default function SignIn(props) {
     }
     setisSubmitting(true);
     // console.log(phoneNo);
+
     try {
+      let loginData = {phone: phoneNo};
+
       axiosPost(
         'auth/login',
-        {phone: phoneNo},
+        loginData,
         response => {
           Alert.alert('Success', response.message);
           setisSubmitting(false);

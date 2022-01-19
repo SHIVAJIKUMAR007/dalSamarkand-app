@@ -23,37 +23,59 @@ import {ICONS} from '../../../constants/icons';
 import {axiosGet} from '../../../axios';
 import {ActivityIndicator} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-community/async-storage';
+import {dalsamarkandCartId} from '../../../constants/appConstant';
+import AlertMsg from '../../../components/alert-msg';
 
 export default function Cart(props) {
   const [cart, setcart] = useGlobal('cart');
   const [user, setuser] = useGlobal('user');
-  const [totalPrice, settotalPrice] = useState(0);
   const [checkout, setcheckout] = useState(null);
   const [isLoading, setisLoading] = useState(false);
   const [isUpdatingCart, setisUpdatingCart] = useState(false);
-
+  const getUnauthCart = async () => {
+    let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
+    console.log(cartId, 'cartid in cart');
+    if (cartId) {
+      axiosGet(
+        'cart/' + cartId,
+        data => {
+          setcart(data?.items);
+          setcheckout(data);
+          setisLoading(false);
+        },
+        res => console.log(res),
+        null,
+        setuser,
+      );
+    } else {
+      setcart([]);
+      setcheckout({});
+      setisLoading(false);
+    }
+  };
   useEffect(() => {
     let isMounted = true;
     setisLoading(true);
-    axiosGet(
-      'cart',
-      data => {
-        console.log(data);
-        setisLoading(false);
-        if (isMounted) {
-          setcart(data?.items);
-          settotalPrice(data?.subTotal);
-          setcheckout(data);
-        }
-      },
-      null,
-      props.navigation,
-      setuser,
-    );
+    if (user)
+      axiosGet(
+        'cart',
+        data => {
+          console.log(data);
+          setisLoading(false);
+          if (isMounted) {
+            setcart(data?.items);
+            setcheckout(data);
+          }
+        },
+        null,
+        props.navigation,
+        setuser,
+      );
+    else getUnauthCart();
     return () => {
       isMounted = false;
       setisLoading(false);
-      settotalPrice(0);
     };
   }, [cart?.length]);
 
@@ -113,11 +135,16 @@ export default function Cart(props) {
             <BrownBtn
               title="Complete order"
               disabled={isUpdatingCart}
-              onPress={() =>
-                props.navigation.navigate('CheckoutDelivery', {
-                  checkout: checkout,
-                })
-              }
+              onPress={() => {
+                if (user)
+                  props.navigation.navigate('CheckoutDelivery', {
+                    checkout: checkout,
+                  });
+                else {
+                  AlertMsg('Please login to proceed further.');
+                  props.navigation.navigate('SignIn');
+                }
+              }}
             />
           </View>
         </>
@@ -164,7 +191,7 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
               setcart,
               navigation,
               setuser,
-              settotalPrice,
+              setcheckout,
               cartItem?.title,
               setisCartLoading,
             );
@@ -192,11 +219,12 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
         updateItemInCart(
           cartItem?._id,
           addMore ? qty + 1 : qty - 1,
+          null,
           navigation,
           setuser,
-          setisLoading,
           setcheckout,
           setisCartLoading,
+          setcart,
         );
       }, 700),
     );

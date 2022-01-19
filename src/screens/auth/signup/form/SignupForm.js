@@ -7,7 +7,6 @@ import {
   StatusBar,
   ImageBackground,
   ScrollView,
-  BackHandler,
   Alert,
   Platform,
 } from 'react-native';
@@ -17,9 +16,7 @@ import {COLORS} from '../../../../constants/colors';
 import {IMAGES} from '../../../../constants/images';
 import Feather from 'react-native-vector-icons/Feather';
 import {ICONS} from '../../../../constants/icons';
-import ShadowBtn from '../../../../components/shadow-btn';
 import {useGlobal} from 'reactn';
-import AsyncStorage from '@react-native-community/async-storage';
 import BrownBtn from '../../../../components/brown-btn';
 import {useNavigation} from '@react-navigation/core';
 import {axiosPost} from '../../../../axios';
@@ -81,7 +78,7 @@ export default function SignupForm(props) {
   const onSubmit = async () => {
     if (!validateForm()) return;
     setisSubmitting(true);
-    // navigation.navigate('OtpSignup');
+
     setregisterData(pre => {
       return {...pre, email: pre.email.toLowerCase()};
     });

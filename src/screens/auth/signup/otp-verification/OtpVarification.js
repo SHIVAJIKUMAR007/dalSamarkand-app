@@ -16,7 +16,10 @@ import InputBox from '../../../../components/input-box';
 import axios, {axiosPost} from '../../../../axios';
 import {useGlobal} from 'reactn';
 import AsyncStorage from '@react-native-community/async-storage';
-import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
+import {
+  dalsamarkandCartId,
+  dalsamarkandJwtToken,
+} from '../../../../constants/appConstant';
 import AlertMsg from '../../../../components/alert-msg';
 
 export default function OtpVarification({navigation, route}) {
@@ -52,10 +55,15 @@ export default function OtpVarification({navigation, route}) {
 
   async function submitOtp() {
     setisSubmitting(true);
+    let form = {phone: mobileNumber, code: otp};
     try {
+      let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
+      if (cartId) {
+        form = {...form, cart_id: cartId};
+      }
       axiosPost(
         'auth/verify_otp',
-        {phone: mobileNumber, code: otp},
+        form,
         data => {
           console.log(data);
           AlertMsg(isLogin ? 'Login success' : 'Register success');
@@ -67,6 +75,13 @@ export default function OtpVarification({navigation, route}) {
           settoken(data?.token);
           setisSubmitting(false);
           setuser({_id: 1});
+          // if (cartId) {
+          //   navigation.popToTop();
+          //   navigation.navigate('Cart');
+          // } else {
+          //   navigation.popToTop();
+          //   navigation.navigate('HomeScreen');
+          // }
           navigation.popToTop();
           navigation.navigate('HomeScreen');
         },

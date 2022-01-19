@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useEffect, useLayoutEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -39,6 +39,17 @@ const slides = [
 
 export default function OnBoarding(props) {
   const slider = useRef();
+  async function stater() {
+    const notFirstTime = await AsyncStorage.getItem(firstTimeThreeScreen);
+    if (notFirstTime && notFirstTime.length > 0) {
+      console.log(notFirstTime);
+      props.navigation.navigate('Home');
+    }
+  }
+  useEffect(() => {
+    const reload = props.navigation.addListener('focus', stater);
+    return reload;
+  }, [props.navigation]);
 
   return (
     <>

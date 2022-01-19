@@ -33,28 +33,26 @@ export default function ProductList(props) {
   const [fetchingProduct, setfetchingProduct] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-    setfetchingProduct(true);
-    try {
-      axiosGet(
-        'product',
-        data => {
-          if (isMounted) setproducts(data);
-          setfetchingProduct(false);
-        },
-        null,
-        navigation,
-        setuser,
-      );
-    } catch (error) {
-      console.log(error);
-      setfetchingProduct(false);
-    }
+    const reload = navigation.addListener('focus', () => {
+      setfetchingProduct(true);
+      try {
+        axiosGet(
+          'product',
+          data => {
+            setproducts(data);
+            setfetchingProduct(false);
+          },
+          null,
+          navigation,
+          setuser,
+        );
+      } catch (error) {
+        console.log(error);
+        setfetchingProduct(false);
+      }
+    });
 
-    return () => {
-      isMounted = false;
-      setproducts([]);
-    };
+    return reload;
   }, []);
 
   return (
@@ -114,8 +112,9 @@ const OneProduct = props => {
   let {data, navigation} = props;
   const [qty, setqty] = useState(1);
   const [isLoading, setisLoading] = useState(false);
-  const [cart, setcart] = useGlobal('cart');
   const [user, setuser] = useGlobal('user');
+  const [cart, setcart] = useGlobal('cart');
+
   const [isPresentInCart, setisPresentInCart] = useState(false);
 
   useEffect(() => {
@@ -127,8 +126,8 @@ const OneProduct = props => {
           cartItem?.productId == data?._id
         ) {
           setisPresentInCart(true);
+          console.log(cartItem?.quantity);
           setqty(cartItem?.quantity); /////// same as number in cart
-          // console.log(data?._id);
           break;
         }
       }
@@ -142,7 +141,7 @@ const OneProduct = props => {
     if (!isPresentInCart)
       addToCart(
         data?._id,
-        qty,
+        1,
         setcart,
         navigation,
         setuser,
@@ -153,12 +152,12 @@ const OneProduct = props => {
       updateItemInCart(
         data?._id,
         qty,
-        setcart,
-        val => {},
+        setisLoading,
         navigation,
         setuser,
-        setisLoading,
-        data?.title,
+        null,
+        null,
+        setcart,
       );
   }
 

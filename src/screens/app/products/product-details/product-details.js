@@ -30,34 +30,33 @@ export default function ProductDetails(props) {
   const [product, setproduct] = useState({});
   const [fetchingProduct, setfetchingProduct] = useState(false);
   const [isPresentInCart, setisPresentInCart] = useState(false);
-
+  const [reloadPage, setreloadPage] = useState(false);
   useEffect(() => {
-    let isMounted = true;
-    if (productId) {
-      setfetchingProduct(true);
-      try {
-        axiosGet(
-          `product/${productId}`,
-          data => {
-            if (isMounted) {
+    // reload on every focus
+    const reload = props.navigation.addListener('focus', () => {
+      setreloadPage(pre => !pre);
+      if (productId) {
+        setfetchingProduct(true);
+        try {
+          axiosGet(
+            `product/${productId}`,
+            data => {
               setproduct(data);
-            }
-            setfetchingProduct(false);
-          },
-          null,
-          props.navigation,
-          setuser,
-        );
-      } catch (error) {
-        console.log(error);
-        setfetchingProduct(false);
+              setfetchingProduct(false);
+            },
+            null,
+            props.navigation,
+            setuser,
+          );
+        } catch (error) {
+          console.log(error);
+          setfetchingProduct(false);
+        }
       }
-    }
-    return () => {
-      isMounted = false;
-      setproduct({});
-    };
-  }, [productId]);
+    });
+
+    return reload;
+  }, [productId, props.navigation]);
 
   useEffect(() => {
     if (cart && product?._id) {
@@ -77,13 +76,13 @@ export default function ProductDetails(props) {
     return () => {
       setisPresentInCart(false);
     };
-  }, [product?._id, cart?.length]);
+  }, [product?._id, cart?.length, reloadPage]);
 
   async function addItemToCart() {
     if (!isPresentInCart)
       addToCart(
         product?._id,
-        qty,
+        1,
         setcart,
         props.navigation,
         setuser,
@@ -93,12 +92,12 @@ export default function ProductDetails(props) {
       updateItemInCart(
         product?._id,
         qty,
-        setcart,
-        val => {},
+        setisLoading,
         props.navigation,
         setuser,
-        setisLoading,
-        product?.title,
+        null,
+        null,
+        setcart,
       );
   }
 

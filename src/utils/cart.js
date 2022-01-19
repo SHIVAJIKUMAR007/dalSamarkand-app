@@ -8,23 +8,23 @@ import {
 } from '../constants/appConstant';
 /////////////////////   server end cart ///////////////////////////////////
 
-export const getCart = async (setcart, setuser) => {
+const getCartId = async () => {
   try {
     let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
-    // axiosGet(
-    //   'cart/' + cartId,
-    //   async data => {
-    //     setcart(data?.items);
-    //     if (!cartId) {
-    //       await AsyncStorage.setItem(dalsamarkandCartId, data?._id);
-    //     }
-    //   },
-    //   res => console.log(res),
-    //   null,
-    //   setuser,
-    // );
+    if (cartId) return cartId;
+    else {
+      let cart = await (await instance.get('cart/create_cart')).data;
+      console.log(cart);
+      if (cart?.status_code == 1) {
+        await AsyncStorage.setItem(dalsamarkandCartId, cart?.data?._id);
+        return cart?.data?._id;
+      } else {
+        return null;
+      }
+    }
   } catch (error) {
     console.log(error);
+    return null;
   }
 };
 
@@ -40,10 +40,18 @@ export const addToCart = async (
   try {
     setisLoading(true);
     // const startTime = Date.now();
-    let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
-
+    let cartId;
+    let token = await AsyncStorage.getItem(dalsamarkandJwtToken);
+    if (!token) {
+      cartId = await getCartId();
+      if (!cartId) {
+        AlertMsg(`Some problem occured`);
+        setisLoading(false);
+        return;
+      }
+    }
     axiosPost(
-      'cart',
+      token ? 'cart' : `cart/${cartId}`,
       {productId: cartItemId, quantity: qty, cartId},
       async data => {
         // const endtime = Date.now();
@@ -75,17 +83,26 @@ export const removeFromCart = async (
   setcart,
   navigation,
   setuser,
-  settotalPrice,
+  setcheckout,
   itemName,
   setisCartLoading,
 ) => {
   try {
     // const startTime = Date.now();
-    let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
+    let token = await AsyncStorage.getItem(dalsamarkandJwtToken);
+    let cartId;
+    if (!token) {
+      cartId = await getCartId();
+      if (!cartId) {
+        AlertMsg(`Some problem occured`);
+        setisLoading(false);
+        return;
+      }
+    }
     let form = {productId: itemId, quantity: '0', cartId};
 
     axiosPost(
-      'cart',
+      token ? 'cart' : `cart/${cartId}`,
       form,
       async data => {
         // AlertMsg(itemName + ' removed from the cart.');
@@ -96,7 +113,7 @@ export const removeFromCart = async (
         // );
         // console.log(data?.items);
         setcart(data?.items);
-        settotalPrice(data?.subTotal);
+        if (setcheckout) setcheckout(data);
         setisCartLoading(false);
 
         return true;
@@ -118,24 +135,38 @@ export const removeFromCart = async (
 export const updateItemInCart = async (
   itemId,
   qty,
+  setisLoading,
   navigation,
   setuser,
-  setisLoading,
   setcheckout,
   setisCartLoading,
+  setcart,
 ) => {
-  let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
-
   let form = {productId: itemId, quantity: qty, cartId};
-  setisLoading(true);
+  let cartId;
   try {
+    if (setisLoading) setisLoading(true);
     let token = await AsyncStorage.getItem(dalsamarkandJwtToken);
+
+    if (!token) {
+      cartId = await getCartId();
+      console.log(cartId);
+      if (!cartId) {
+        AlertMsg(`Some problem occured`);
+        setisLoading(false);
+        return;
+      }
+    }
     // const startTime = Date.now();
-    let updateData = await instance.put('cart/quantity', form, {
-      headers: {
-        Authorization: token,
+    let updateData = await instance.put(
+      token ? 'cart/quantity' : `cart/${cartId}/quantity`,
+      form,
+      {
+        headers: {
+          Authorization: token,
+        },
       },
-    });
+    );
     updateData = await updateData?.data;
 
     if (updateData?.status_code == 1) {
@@ -150,24 +181,25 @@ export const updateItemInCart = async (
       //   endtime - startTime,
       //   'time taken to get response from update cart time api',
       // );
-      // setcart(updateData?.items);
-      setcheckout(updateData);
+      if (setcart) setcart(updateData?.items);
+      if (setcheckout) setcheckout(updateData);
       // settotalPrice(updateData?.subTotal);
+      if (setisLoading) setisLoading(false);
 
-      setisLoading(false);
-      setisCartLoading(false);
+      if (setisCartLoading) setisCartLoading(false);
 
       return true;
     } else {
       AlertMsg('Error ' + updateData?.message);
       console.log(updateData);
     }
-    setisCartLoading(false);
+    if (setisLoading) setisLoading(false);
+    if (setisCartLoading) setisCartLoading(false);
   } catch (error) {
     console.log(error);
     AlertMsg('Error occured' + error);
-    setisLoading(false);
-    setisCartLoading(false);
+    if (setisCartLoading) setisCartLoading(false);
+    if (setisLoading) setisLoading(false);
     return false;
   }
 };

@@ -65,7 +65,7 @@ export default function CheckoutDelivery(props) {
     axiosGet(
       'address',
       data => {
-        // console.log(data, ' =========> 59');
+        console.log(data, ' =========> 59');
         setallAddress(data?.items);
       },
       res => console.log(res),
@@ -284,7 +284,7 @@ export default function CheckoutDelivery(props) {
             <Text style={styles.totalAmt}>
               Rs.{' '}
               {checkout?.subTotal +
-                (checkout?.deleveryCharge ? checkout?.deleveryCharge : 0)}
+                (checkout?.delivery_charges ? checkout?.delivery_charges : 0)}
             </Text>
           </View>
         </View>

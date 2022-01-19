@@ -12,12 +12,8 @@ import {
 // import {axiosGet} from './src/axios';
 import {requestForTrckingPermission} from './src/utils/userTraking';
 import axios from 'axios';
-import {getCart} from './src/utils/cart';
 
 export default function App() {
-  const [cart, setcart] = useGlobal('cart');
-  const [user, setuser] = useGlobal('user');
-
   useEffect(() => {
     let isMount = true;
 
@@ -26,8 +22,6 @@ export default function App() {
         try {
           let res = await axios.get('https://dalsamarkand.com/');
           res = await res.data;
-          // get cart by stored cartId
-          getCart(setcart, setuser);
         } catch (error) {
           console.log(error);
         }

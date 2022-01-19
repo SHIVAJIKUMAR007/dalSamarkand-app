@@ -1,6 +1,8 @@
+import {Platform} from 'react-native';
+
 const FONT_FAMILY = {
   bellefair: 'Bellefair-Regular',
-  baskervilleOldFace: 'BASKVILL',
+  baskervilleOldFace: Platform.OS == 'ios' ? 'Baskerville-Regular' : 'BASKVILL',
 };
 
 export {FONT_FAMILY};

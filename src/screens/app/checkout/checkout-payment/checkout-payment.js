@@ -18,7 +18,7 @@ import {appLogo, appName} from '../../../../constants/appConstant';
 import {COLORS} from '../../../../constants/colors';
 import GreyInputBox from '../../../../components/grey-input-box';
 import AlertMsg from '../../../../components/alert-msg';
-import AllInOneSDKManager from 'paytm_allinone_react-native';
+// import AllInOneSDKManager from 'paytm_allinone_react-native';
 
 const {width} = Dimensions.get('window');
 export default function CheckoutPayment(props) {
@@ -93,6 +93,10 @@ export default function CheckoutPayment(props) {
       );
       return;
     }
+    if (!orderDetail?.payment_type) {
+      Alert.alert('', 'Choose a payment method.');
+      return;
+    }
     try {
       setisSubmitting(true);
       axiosPost(
@@ -100,14 +104,16 @@ export default function CheckoutPayment(props) {
         orderDetail,
         data => {
           ////////////////// order is placed hence empty the cart //////////////////
+          console.log(data, 'dsjfsdfjksdlfjljk');
           setcart([]);
+          setcheckout({});
           ////////////////////// if paying with razorpay ?////////////////////////////
           if (orderDetail?.payment_type == 'razorpay') {
             var options = {
               description: 'Credits towards ' + appName,
               image: appLogo,
               currency: 'INR',
-              key: data?.razorpay_key,
+              key: data?.extra_data?.razorpay_key,
               name: appName,
               order_id: data?.order?.payment_details?.order_id, //Replace this with an order_id created using Orders API.
               theme: {color: COLORS.PRIMARY_LIGHT},
@@ -116,14 +122,15 @@ export default function CheckoutPayment(props) {
               .then(data => {
                 // handle success
 
-                alert(`Success`, 'Your payment is successfully done.');
+                Alert.alert(`Success`, 'Your payment is successfully done.');
 
                 setisSubmitting(false);
                 props.navigation.navigate('ThankYou');
               })
               .catch(error => {
                 // handle failure
-                alert(`Error: ${error.code} | ${error.description}`);
+                error = JSON.parse(error?.description)?.error?.description;
+                Alert.alert('Error', ` ${error}`);
                 setisSubmitting(false);
               });
           }
@@ -135,16 +142,19 @@ export default function CheckoutPayment(props) {
           }
           //////////else if paytm
           else if (orderDetail?.payment_type == 'paytm') {
+          } else {
+            setisSubmitting(false);
+            Alert.alert('Error', `Please select a correct payment type`);
           }
         },
         res => {
           console.log(res);
-          Alert('Fail', res?.toString());
+          Alert.alert('Fail', JSON.stringify(res));
           setisSubmitting(false);
         },
         res => {
           console.log(res);
-          Alert('Fail', res?.toString());
+          Alert.alert('Fail', JSON.stringify(res));
           setisSubmitting(false);
         },
         props.navigation,
@@ -245,7 +255,7 @@ export default function CheckoutPayment(props) {
             }}>
             <GreyInputBox
               placeholder="Enter a valid coupon code"
-              style={{flex: 1, maxWidth: width * 0.65}}
+              style={{flex: 1, width: width * 0.65}}
               value={orderDetail?.coupon}
               onChangeText={val => {
                 setorderDetail(pre => {

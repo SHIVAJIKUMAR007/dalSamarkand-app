@@ -24,8 +24,12 @@ function err_handler(error_msg, url) {
   Alert.alert('Error!', error_msg);
 }
 
-function unknown_err_handler({message}) {
-  Alert.alert('Error!', message);
+function unknown_err_handler(response, url) {
+  console.log(response, url, 'sdjfk');
+  Alert.alert(
+    'Error!',
+    response?.message ? response.message : 'Somthing when wrong.',
+  );
 }
 
 function success_handler({message}) {
@@ -56,7 +60,7 @@ async function axiosPost(
       })
       .then(res => res.data)
       .then(response => {
-        console.log(response, '========>res');
+        console.log(response, '========>rekjfksdkfjss');
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response);
@@ -89,12 +93,16 @@ async function axiosPost(
           }
 
           default:
-            unknown_err_handler(response);
+            unknown_err_handler(response, url);
         }
       })
       .catch(err => {
         console.log(err?.response?.status);
-        if (err?.response?.status == 422 || err?.response?.status == 401) {
+        if (err?.response?.status == 422) {
+          console.log(err?.response?.data?.errors, 'err ');
+          if (cb_form_validator) cb_form_validator(err);
+          else form_validation_handler(err);
+        } else if (err?.response?.status == 401) {
           console.log('invalide user login first ');
           invalid_user_handler(navigation, setuser);
         } else {
@@ -114,7 +122,7 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
       })
       .then(res => res.data)
       .then(response => {
-        // console.log(response);
+        console.log(response, 'get request res', url);
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response?.error);
@@ -143,7 +151,7 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
           case -4: {
           }
           default:
-            unknown_err_handler(response);
+            unknown_err_handler(response, url);
         }
       })
 

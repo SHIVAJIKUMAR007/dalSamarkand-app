@@ -20,7 +20,10 @@ import {axiosGet} from '../../../axios';
 import {useGlobal} from 'reactn';
 import {useNavigation} from '@react-navigation/core';
 import AsyncStorage from '@react-native-community/async-storage';
-import {dalsamarkandJwtToken} from '../../../constants/appConstant';
+import {
+  dalsamarkandCartId,
+  dalsamarkandJwtToken,
+} from '../../../constants/appConstant';
 
 export default function HomeScreen(props) {
   const scrollViewRef = useRef();
@@ -29,7 +32,7 @@ export default function HomeScreen(props) {
   const navigation = useNavigation();
   const [cart, setcart] = useGlobal('cart');
 
-  ///////////////////// check for user is exist or not ///////////////////////////////////////////////
+  ///////////////////// check for user is exist or not and get a cart ///////////////////////////////////////////////
   const checkAuthData = async () => {
     const tempAuth = await AsyncStorage.getItem(dalsamarkandJwtToken);
 
@@ -40,15 +43,15 @@ export default function HomeScreen(props) {
           async userData => {
             console.log(userData, '===========>38 home.js');
             setuser(userData);
-            // axiosGet(
-            //   'cart',
-            //   data => {
-            //     setcart(data?.items);
-            //   },
-            //   res => console.log(res),
-            //   null,
-            //   setuser,
-            // );
+            axiosGet(
+              'cart',
+              data => {
+                setcart(data?.items);
+              },
+              res => console.log(res),
+              null,
+              setuser,
+            );
           },
           res => {
             AsyncStorage.removeItem(dalsamarkandJwtToken);
@@ -57,12 +60,40 @@ export default function HomeScreen(props) {
           null,
           setuser,
         );
-      }, 500);
+      }, 100);
     } else {
       setuser(null);
+      let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
+      // console.log(cartId, 'cartid');
+      if (cartId) {
+        axiosGet(
+          'cart/' + cartId,
+          data => {
+            setcart(data?.items);
+          },
+          res => console.log(res),
+          null,
+          setuser,
+        );
+      } else {
+        setcart([]);
+        // axiosGet(
+        //   'cart/create_cart',
+        //   async data => {
+        //     // console.log(data, 'djjfdfjsdk');
+        //     await AsyncStorage.setItem(dalsamarkandCartId, data?._id);
+        //     setcart(data?.items);
+        //   },
+        //   res => {
+        //     console.log(res, 'error in create cart');
+        //   },
+        //   null,
+        //   setuser,
+        // );
+      }
     }
   };
-
+  /////////////////////// check for user is exist or not and get a cart ends ////////////////////////////////////
   useEffect(() => {
     let isMounted = true;
     axiosGet(
