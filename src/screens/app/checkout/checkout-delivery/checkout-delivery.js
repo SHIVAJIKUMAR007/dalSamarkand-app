@@ -65,7 +65,7 @@ export default function CheckoutDelivery(props) {
     axiosGet(
       'address',
       data => {
-        console.log(data, ' =========> 59');
+        // console.log(data, ' =========> 59');
         setallAddress(data?.items);
       },
       res => console.log(res),
@@ -122,25 +122,6 @@ export default function CheckoutDelivery(props) {
     ]);
   }
 
-  // async function applyCoupon() {
-  //   axiosPost(
-  //     'cart/apply_coupon',
-  //     {coupon: couponCode},
-  //     res => {
-  //       console.log(res?.message);
-  //       AlertMsg(res?.message);
-  //       // checkout.subTotal = checkout.subTotal - res?.coupon_data?.value;
-  //     },
-  //     res => {
-  //       console.log(res);
-  //     },
-  //     res => {
-  //       console.log(res);
-  //     },
-  //     props.navigation,
-  //     setuser,
-  //   );
-  // }
   return (
     <View style={styles.topBg}>
       <StatusBar
@@ -405,7 +386,7 @@ const AddressModal = ({
   }
 
   function addAddress() {
-    console.log(addressData);
+    // console.log(addressData);
     if (!validform()) return;
     setisLoading(true);
     try {

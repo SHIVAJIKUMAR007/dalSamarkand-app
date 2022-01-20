@@ -24,6 +24,7 @@ import {
   dalsamarkandCartId,
   dalsamarkandJwtToken,
 } from '../../../constants/appConstant';
+import StoreStateMsg from '../../../components/StoreStateMsg';
 
 export default function HomeScreen(props) {
   const scrollViewRef = useRef();
@@ -41,7 +42,7 @@ export default function HomeScreen(props) {
         axiosGet(
           'profile',
           async userData => {
-            console.log(userData, '===========>38 home.js');
+            // console.log(userData, '===========>38 home.js');
             setuser(userData);
             axiosGet(
               'cart',
@@ -77,19 +78,6 @@ export default function HomeScreen(props) {
         );
       } else {
         setcart([]);
-        // axiosGet(
-        //   'cart/create_cart',
-        //   async data => {
-        //     // console.log(data, 'djjfdfjsdk');
-        //     await AsyncStorage.setItem(dalsamarkandCartId, data?._id);
-        //     setcart(data?.items);
-        //   },
-        //   res => {
-        //     console.log(res, 'error in create cart');
-        //   },
-        //   null,
-        //   setuser,
-        // );
       }
     }
   };
@@ -106,7 +94,7 @@ export default function HomeScreen(props) {
       setuser,
     );
     checkAuthData(isMounted);
-
+    // console.log(settings, 'settings');
     //this is for exit app at home event listner
     let backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -159,6 +147,9 @@ export default function HomeScreen(props) {
         source={IMAGES.HOME_BG2}
         resizeMethod="auto"
         style={styles.infoBg}>
+        {/* store state open or close msg  */}
+        <StoreStateMsg />
+        {/* store state open or close msg  */}
         <ImageBackground
           source={IMAGES.IMAGE_BORDER}
           resizeMethod="auto"

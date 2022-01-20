@@ -26,6 +26,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-community/async-storage';
 import {dalsamarkandCartId} from '../../../constants/appConstant';
 import AlertMsg from '../../../components/alert-msg';
+import StoreStateMsg from '../../../components/StoreStateMsg';
 
 export default function Cart(props) {
   const [cart, setcart] = useGlobal('cart');
@@ -35,7 +36,7 @@ export default function Cart(props) {
   const [isUpdatingCart, setisUpdatingCart] = useState(false);
   const getUnauthCart = async () => {
     let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
-    console.log(cartId, 'cartid in cart');
+    // console.log(cartId, 'cartid in cart');
     if (cartId) {
       axiosGet(
         'cart/' + cartId,
@@ -89,6 +90,7 @@ export default function Cart(props) {
       style={styles.topBg}>
       <View style={{paddingHorizontal: 15}}>
         <CustomHeader title="Cart" />
+        <StoreStateMsg />
       </View>
 
       {isLoading ? (

@@ -122,28 +122,30 @@ export default function SignupForm(props) {
   };
 
   const acceptTermsFunction = async newValue => {
-    if (Platform.OS != 'ios') {
-      setToggleCheckBox(newValue);
-      return;
-    }
-    if (!newValue) {
-      setToggleCheckBox(newValue);
-      return;
-    }
-    try {
-      let TrackingPermissionIos = await getTrackingPermissionStatus();
-      console.log(TrackingPermissionIos);
-      if (TrackingPermissionIos) {
-        setToggleCheckBox(newValue);
-        return;
-      }
-      Alert.alert(
-        'Tracking permission required',
-        'You need to give tracking permission to signup to Dal Samarkand.',
-      );
-    } catch (error) {
-      console.log(error);
-    }
+    setToggleCheckBox(newValue);
+    return;
+    // if (Platform.OS != 'ios') {
+    //   setToggleCheckBox(newValue);
+    //   return;
+    // }
+    // if (!newValue) {
+    //   setToggleCheckBox(newValue);
+    //   return;
+    // }
+    // try {
+    //   let TrackingPermissionIos = await getTrackingPermissionStatus();
+    //   console.log(TrackingPermissionIos);
+    //   if (TrackingPermissionIos) {
+    //     setToggleCheckBox(newValue);
+    //     return;
+    //   }
+    //   Alert.alert(
+    //     'Tracking permission required',
+    //     'You need to accept our terms and conditions and give tracking permission before proceed, for that go to Settings -> Privacy -> Tracking and turn on permission for Dal Samarkand.',
+    //   );
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
   return (
     <ScrollView>

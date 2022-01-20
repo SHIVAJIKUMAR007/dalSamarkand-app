@@ -11,7 +11,11 @@ export const requestForTrckingPermission = async () => {
   // console.log('inside request tracking permission function');
   if (Platform.OS != 'ios') return true;
   const trackingStatus = await requestTrackingPermission();
-  if (trackingStatus === 'authorized' || trackingStatus === 'unavailable') {
+  if (
+    trackingStatus === 'authorized' ||
+    trackingStatus == 'not-determined' ||
+    trackingStatus === 'unavailable'
+  ) {
     // enable tracking features
     return true;
   }
@@ -21,7 +25,11 @@ export const requestForTrckingPermission = async () => {
 export const getTrackingPermissionStatus = async alertMessage => {
   if (Platform.OS != 'ios') return true;
   const trackingStatus = await getTrackingStatus();
-  if (trackingStatus === 'authorized' || trackingStatus === 'unavailable') {
+  if (
+    trackingStatus === 'authorized' ||
+    trackingStatus == 'not-determined' ||
+    trackingStatus === 'unavailable'
+  ) {
     // enable tracking features
     return true;
   }

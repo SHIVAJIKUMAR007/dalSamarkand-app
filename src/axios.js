@@ -60,7 +60,7 @@ async function axiosPost(
       })
       .then(res => res.data)
       .then(response => {
-        console.log(response, '========>rekjfksdkfjss');
+        // console.log(response, '========>rekjfksdkfjss');
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response);
@@ -122,7 +122,7 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
       })
       .then(res => res.data)
       .then(response => {
-        console.log(response, 'get request res', url);
+        // console.log(response, 'get request res', url);
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response?.error);

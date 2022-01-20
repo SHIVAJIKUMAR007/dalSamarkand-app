@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import styles from './style';
 import CustomHeader from '../../../../components/custom-header';
@@ -18,7 +19,7 @@ import {appLogo, appName} from '../../../../constants/appConstant';
 import {COLORS} from '../../../../constants/colors';
 import GreyInputBox from '../../../../components/grey-input-box';
 import AlertMsg from '../../../../components/alert-msg';
-// import AllInOneSDKManager from 'paytm_allinone_react-native';
+import AllInOneSDKManager from 'paytm_allinone_react-native';
 
 const {width} = Dimensions.get('window');
 export default function CheckoutPayment(props) {
@@ -86,13 +87,13 @@ export default function CheckoutPayment(props) {
     );
   }
   async function handleOrder() {
-    if (orderDetail?.payment_type == 'paytm') {
-      Alert.alert(
-        '',
-        'Paytm is not available as of now, we are tring to add it.',
-      );
-      return;
-    }
+    // if (orderDetail?.payment_type == 'paytm') {
+    //   Alert.alert(
+    //     '',
+    //     'Paytm is not available as of now, we are tring to add it.',
+    //   );
+    //   return;
+    // }
     if (!orderDetail?.payment_type) {
       Alert.alert('', 'Choose a payment method.');
       return;
@@ -104,7 +105,7 @@ export default function CheckoutPayment(props) {
         orderDetail,
         data => {
           ////////////////// order is placed hence empty the cart //////////////////
-          console.log(data, 'dsjfsdfjksdlfjljk');
+          // console.log(data, 'dsjfsdfjksdlfjljk');
           setcart([]);
           setcheckout({});
           ////////////////////// if paying with razorpay ?////////////////////////////
@@ -142,6 +143,64 @@ export default function CheckoutPayment(props) {
           }
           //////////else if paytm
           else if (orderDetail?.payment_type == 'paytm') {
+            let details = data?.order?.payment_details;
+            console.log(details);
+            Platform.OS == 'ios'
+              ? // if platform is ios
+                AllInOneSDKManager.startTransaction(
+                  details?.order_id,
+                  details?.mid,
+                  details?.txnToken,
+                  details?.amount,
+                  'https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=' +
+                    details?.order_id,
+                  true,
+                  true,
+                  'paytmMID' + details?.mid,
+                )
+                  .then(result => {
+                    Alert.alert(
+                      `Success`,
+                      'Your payment is successfully done.',
+                    );
+                    console.log(result);
+                    setisSubmitting(false);
+                    props.navigation.navigate('ThankYou');
+                  })
+                  .catch(err => {
+                    // handleError(err);
+                    console.log(err);
+                    Alert.alert(`Fail`, 'Your payment is failed.');
+
+                    setisSubmitting(false);
+                  })
+              : // if platform is android
+                AllInOneSDKManager.startTransaction(
+                  details?.order_id,
+                  details?.mid,
+                  details?.txnToken,
+                  details?.amount,
+                  'https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=' +
+                    details?.order_id,
+                  true,
+                  true,
+                )
+                  .then(result => {
+                    Alert.alert(
+                      `Success`,
+                      'Your payment is successfully done.',
+                    );
+                    console.log(result);
+                    setisSubmitting(false);
+                    props.navigation.navigate('ThankYou');
+                  })
+                  .catch(err => {
+                    // handleError(err);
+                    console.log(err);
+                    Alert.alert(`Fail`, 'Your payment is failed.');
+
+                    setisSubmitting(false);
+                  });
           } else {
             setisSubmitting(false);
             Alert.alert('Error', `Please select a correct payment type`);
