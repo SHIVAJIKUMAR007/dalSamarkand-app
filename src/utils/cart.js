@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {Alert} from 'react-native';
 import instance, {axiosGet, axiosPost} from '../axios';
 import AlertMsg from '../components/alert-msg';
+import {ErrorToast} from '../components/CustmToast';
 import {
   dalsamarkandCartId,
   dalsamarkandJwtToken,
@@ -197,6 +198,7 @@ export const updateItemInCart = async (
     if (setisCartLoading) setisCartLoading(false);
   } catch (error) {
     console.log(error);
+    // ErrorToast(toast,error.message);
     AlertMsg('Error occured' + error);
     if (setisCartLoading) setisCartLoading(false);
     if (setisLoading) setisLoading(false);

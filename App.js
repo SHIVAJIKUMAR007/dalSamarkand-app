@@ -1,16 +1,13 @@
 import React, {useEffect} from 'react';
 import {StatusBar} from 'react-native';
-// import AsyncStorage from '@react-native-community/async-storage';
-import {useGlobal} from 'reactn';
-// import SplashScreen from 'react-native-splash-screen';
-// import AuthNavigator from './src/navigations/auth-navigator';
 import AppNavigator from './src/navigations/app-navigator';
 import {
   notificationListner,
   requestUserPermission,
 } from './src/utils/notificationService';
-// import {axiosGet} from './src/axios';
 import {requestForTrckingPermission} from './src/utils/userTraking';
+import {ToastProvider} from 'react-native-toast-notifications';
+
 import axios from 'axios';
 
 export default function App() {
@@ -47,7 +44,9 @@ export default function App() {
       />
 
       {/* {user ? <AppNavigator /> : <AuthNavigator />} */}
-      <AppNavigator />
+      <ToastProvider>
+        <AppNavigator />
+      </ToastProvider>
     </React.Fragment>
   );
 }

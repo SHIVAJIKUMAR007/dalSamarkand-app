@@ -5,7 +5,6 @@ import {
   StatusBar,
   Image,
   TouchableOpacity,
-  Alert,
   ScrollView,
 } from 'react-native';
 import CustomHeader from '../../../../components/custom-header';
@@ -21,6 +20,8 @@ import {
   dalsamarkandJwtToken,
 } from '../../../../constants/appConstant';
 import AlertMsg from '../../../../components/alert-msg';
+import {useToast} from 'react-native-toast-notifications';
+import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
 
 export default function OtpVarification({navigation, route}) {
   let mobileNumber = route?.params?.mobileNumber;
@@ -29,9 +30,12 @@ export default function OtpVarification({navigation, route}) {
   const [user, setuser] = useGlobal('user');
   const [token, settoken] = useGlobal('jwtToken');
   const [isSubmitting, setisSubmitting] = useState(false);
+  const [resendEnable, setresendEnable] = useState(true);
+  const toast = useToast();
 
   async function resendOtp() {
     console.log('in resend');
+
     try {
       ///// api is not working
       let res = await axios.post('auth/resend_otp', {
@@ -41,14 +45,22 @@ export default function OtpVarification({navigation, route}) {
       res = res.data;
       console.log(res, '+++++++++++>26');
       if (res.status_code == 1) {
-        AlertMsg(res.message);
+        setresendEnable(false);
+        setTimeout(() => {
+          setresendEnable(true);
+        }, 20000);
+        // AlertMsg(res.message);
+        SuccessToast(toast, res.message);
         // Alert.alert('Success', res.message);
       } else {
-        AlertMsg(res.message);
+        // AlertMsg(res.message);
+        ErrorToast(toast, res.message || res.error || JSON.stringify(res));
         // Alert.alert('Fail', res.message);
       }
     } catch (error) {
-      AlertMsg(error.message);
+      // AlertMsg(error.message);
+      ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+
       console.log(error, 'sdjfk');
     }
   }
@@ -66,7 +78,7 @@ export default function OtpVarification({navigation, route}) {
         form,
         data => {
           console.log(data);
-          AlertMsg(isLogin ? 'Login success' : 'Register success');
+          SuccessToast(toast, isLogin ? 'Login success' : 'Register success');
           // Alert.alert(
           //   isLogin ? 'Login success' : 'Register success',
           //   data.message,
@@ -86,7 +98,8 @@ export default function OtpVarification({navigation, route}) {
           navigation.navigate('HomeScreen');
         },
         res => {
-          AlertMsg(
+          ErrorToast(
+            toast,
             isLogin
               ? 'Login fail, ' + res.message
               : 'Register fail, ' + res.message,
@@ -101,13 +114,13 @@ export default function OtpVarification({navigation, route}) {
       );
     } catch (error) {
       console.log(error);
-      AlertMsg(error.message);
+      ErrorToast(toast, error.message);
       setisSubmitting(false);
     }
 
     setTimeout(() => {
       setisSubmitting(false);
-    }, 3000);
+    }, 5000);
   }
   return (
     <ScrollView>
@@ -140,7 +153,7 @@ export default function OtpVarification({navigation, route}) {
           />
           <View style={styles.row}>
             <Text style={styles.tc}>Didn’t recieved the OTP? </Text>
-            <TouchableOpacity onPress={resendOtp}>
+            <TouchableOpacity disabled={!resendEnable} onPress={resendOtp}>
               <Text style={styles.tc}> RESEND OTP</Text>
             </TouchableOpacity>
           </View>

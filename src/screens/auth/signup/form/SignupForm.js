@@ -21,6 +21,8 @@ import BrownBtn from '../../../../components/brown-btn';
 import {useNavigation} from '@react-navigation/core';
 import {axiosPost} from '../../../../axios';
 import {CheckBox} from 'react-native-elements';
+import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
+import {useToast} from 'react-native-toast-notifications';
 
 export default function SignupForm(props) {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
@@ -34,6 +36,7 @@ export default function SignupForm(props) {
 
   const [isSubmitting, setisSubmitting] = useState(false);
   const [isValidForm, setisValidForm] = useState(false);
+  const toast = useToast();
   function validateFormConti(registerData) {
     let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (
@@ -52,25 +55,35 @@ export default function SignupForm(props) {
   }
   function validateForm() {
     if (registerData?.name == '') {
-      Alert.alert('Please Check', 'Name field is required.');
+      // Alert.alert('Please Check', );
+      ErrorToast(toast, 'Name field is required.');
+
       return false;
     }
     let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!registerData?.email.match(validEmailType)) {
-      Alert.alert('Please Check', 'Email is not valid.');
+      // Alert.alert('Please Check',);
+      ErrorToast(toast, 'Email is not valid.');
+
       return false;
     }
     if (registerData?.phone.length != 10) {
-      Alert.alert('Please Check', 'Mobile number must be of 10 digit.');
+      // Alert.alert('Please Check',);
+      ErrorToast(toast, 'Mobile number must be of 10 digit.');
+
       return false;
     }
     if (toggleCheckBox === false) {
-      Alert.alert(
-        Platform.OS == 'ios' ? 'Permission required' : 'Please check',
+      // Alert.alert(
+      //   Platform.OS == 'ios' ? 'Permission required' : 'Please check',
+      // );
+      ErrorToast(
+        toast,
         Platform.OS == 'ios'
           ? 'You need to accept our terms and conditions and give tracking permission before proceed for that go to Settings -> Privacy -> Tracking and turn on permission for AIBA.'
           : 'You need to accept our terms and conditions before proceed',
       );
+
       return false;
     }
     return true;
@@ -88,7 +101,8 @@ export default function SignupForm(props) {
         registerData,
         data => {
           console.log(data);
-          Alert.alert('Success', data.message);
+          // Alert.alert('Success', data.message);
+          SuccessToast(toast, data.message);
           setisSubmitting(false);
           props.navigation.navigate('OtpSignup', {
             mobileNumber: registerData?.phone,
@@ -97,7 +111,8 @@ export default function SignupForm(props) {
         },
         res => {
           // console.log(res, 'status 0');
-          Alert.alert('Error', res?.message);
+          // Alert.alert('Error', res?.message);
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
         },
         res => {
           // console.log(res);
@@ -106,7 +121,9 @@ export default function SignupForm(props) {
           for (let key in error) {
             errStr += `${error[key]} is duplicate`;
           }
-          Alert.alert('Error', errStr);
+          ErrorToast(toast, errStr);
+
+          // Alert.alert('Error', errStr);
         },
         navigation,
         setuser,
@@ -114,7 +131,8 @@ export default function SignupForm(props) {
     } catch (error) {
       setisSubmitting(false);
       // console.log(error);
-      Alert.alert('Error', error.message);
+      // Alert.alert('Error', error.message);
+      ErrorToast(toast, error.message);
     }
     setTimeout(() => {
       setisSubmitting(false);

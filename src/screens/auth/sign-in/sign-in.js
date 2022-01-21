@@ -20,18 +20,21 @@ import ShadowBtn from '../../../components/shadow-btn';
 import {useGlobal} from 'reactn';
 import {axiosPost} from '../../../axios';
 import {useNavigation} from '@react-navigation/core';
+import {ErrorToast, SuccessToast} from '../../../components/CustmToast';
+import {useToast} from 'react-native-toast-notifications';
 
 export default function SignIn(props) {
   const [phoneNo, setPhoneNo] = useState('');
   const [user, setuser] = useGlobal('user');
   const [token, settoken] = useGlobal('jwtToken');
   const [isSubmitting, setisSubmitting] = useState(false);
+  const toast = useToast();
 
   const navigation = useNavigation();
 
   const onSubmit = async () => {
     if (phoneNo?.length != 10) {
-      Alert.alert('Please Check', 'Mobile number must be of 10 digit.');
+      ErrorToast(toast, 'Mobile number must be of 10 digit.');
       return false;
     }
     setisSubmitting(true);
@@ -44,7 +47,8 @@ export default function SignIn(props) {
         'auth/login',
         loginData,
         response => {
-          Alert.alert('Success', response.message);
+          SuccessToast(toast, response.message || JSON.stringify(response));
+          // Alert.alert('Success', response.message);
           setisSubmitting(false);
           navigation.navigate('OtpSignup', {
             mobileNumber: phoneNo,
@@ -53,7 +57,8 @@ export default function SignIn(props) {
         },
         error => {
           console.log(error.message, '====>58');
-          Alert.alert('Error', error?.message);
+          // Alert.alert('Error', error?.message);
+          ErrorToast(toast, error.message);
         },
         null,
         navigation,
@@ -64,6 +69,7 @@ export default function SignIn(props) {
       // console.log(res.status, res.data);
     } catch (error) {
       setisSubmitting(false);
+      ErrorToast(toast, error.message);
 
       console.log(error, '====>59');
       // for (let key in error) {
@@ -129,7 +135,7 @@ export default function SignIn(props) {
           </Text>
           <ShadowBtn
             marginVertical={10}
-            disabled={phoneNo.length < 10 ? true : false}
+            // disabled={phoneNo.length < 10 ? true : false}
             isLoading={isSubmitting}
             title="Proceed via OTP"
             onPress={() => onSubmit()}

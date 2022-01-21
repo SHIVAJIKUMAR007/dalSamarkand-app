@@ -18,47 +18,85 @@ import GreyInputBox from '../../../../components/grey-input-box';
 import axios, {axiosPost, axiosGet} from '../../../../axios';
 import {useGlobal} from 'reactn';
 import AsyncStorage from '@react-native-community/async-storage';
-import AlertMsg from '../../../../components/alert-msg';
 import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
-import {FONT_FAMILY} from '../../../../constants/font-family';
-import {COLORS} from '../../../../constants/colors';
+import {useToast} from 'react-native-toast-notifications';
+import {isHoliday, isStoreOnTime} from '../../../../utils/settings';
+import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
 
 export default function CheckoutDelivery(props) {
   const [dod, setDod] = useState(moment().format('dddd, LL'));
   const [date, setDate] = useState(new Date());
+  const [rightDateTime, setrightDateTime] = useState({
+    date: false,
+    time: false,
+  });
   const [show, setShow] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [allAddress, setallAddress] = useState([]);
   const [selectedAddress, setselectedAddress] = useState(null);
   const [updateNotAdd, setupdateNotAdd] = useState(false);
   const [updateAddressIndex, setupdateAddressIndex] = useState(null);
-  const [couponCode, setcouponCode] = useState('');
   const [checkout, setcheckout] = useState({});
   const [user, setuser] = useGlobal('user');
-  // let checkout = props?.route?.params?.checkout;
-
-  // let deleveryCharge = props?.route?.params?.deleveryCharge;
-
-  const onChange = (event, selectedDate) => {
+  const toast = useToast();
+  const onChange = async (event, selectedDate) => {
     let currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
     let date_format = moment(currentDate).format('dddd, LL');
     setDate(currentDate);
-    if (event.type === 'set') setDod(date_format);
-    else setDod(null);
+    let result = await isHoliday(toast, currentDate);
+    // console.log(date_format, currentDate, result);
+
+    if (event.type === 'set' && result == 1) {
+      setDod(date_format);
+      setrightDateTime(pre => {
+        return {...pre, date: true};
+      });
+    } else if (event.type === 'set' && result == 0) {
+      setDod('Select date of delivery');
+      setrightDateTime(pre => {
+        return {...pre, date: false};
+      });
+
+      ErrorToast(
+        toast,
+        date_format + ' is holiday and our delivery services will be closed.',
+      );
+    } else {
+      setDod('Select date of delivery');
+      setrightDateTime(pre => {
+        return {...pre, date: false};
+      });
+    }
   };
 
   const [tod, setTod] = useState(moment().format('LT'));
   const [time, setTime] = useState(new Date());
   const [showTime, setShowTime] = useState(false);
 
-  const onChangeTime = (event, selectedDate) => {
-    let currentDate = selectedDate || time;
+  const onChangeTime = async (event, selectedTime) => {
+    let currTime = selectedTime || time;
     setShowTime(Platform.OS === 'ios');
-    let time_format = moment(currentDate).format('LT');
-    setTime(currentDate);
-    if (event.type === 'set') setTod(time_format);
-    else setTod(null);
+    let time_format = moment(currTime).format('LT');
+    setTime(currTime);
+    let result = isStoreOnTime(toast, currTime);
+    console.log(time_format, currTime, result);
+    if (event.type === 'set' && result == 1) {
+      setTod(time_format);
+      setrightDateTime(pre => {
+        return {...pre, time: true};
+      });
+    } else if (event.type === 'set' && result == 0) {
+      setTod('Select time of delivery');
+      setrightDateTime(pre => {
+        return {...pre, time: false};
+      });
+    } else {
+      setTod('Select time of delivery');
+      setrightDateTime(pre => {
+        return {...pre, time: false};
+      });
+    }
   };
 
   useEffect(() => {
@@ -72,6 +110,8 @@ export default function CheckoutDelivery(props) {
       props.navigation,
       setuser,
     );
+    setDod('Select date of delivery');
+    setTod('Select time of delivery');
     setcheckout(props?.route?.params?.checkout);
     // console.log(props?.route?.params?.checkout);
     return () => {
@@ -105,13 +145,17 @@ export default function CheckoutDelivery(props) {
             console.log(deleteMsg);
 
             if (deleteMsg?.status_code == 1) {
-              Alert.alert('Success', deleteMsg?.mgs || deleteMsg?.message);
+              // Alert.alert('Success');
+              SuccessToast(toast, deleteMsg?.mgs || deleteMsg?.message);
+
               setallAddress(deleteMsg?.data?.items);
             } else {
-              Alert.alert('Fail', deleteMsg?.mgs || deleteMsg?.message);
+              // Alert.alert('Fail');
+              ErrorToast(toast, deleteMsg?.mgs || deleteMsg?.message);
             }
           } catch (error) {
-            Alert.alert('Fail', error);
+            // Alert.alert('Fail', error);
+            ErrorToast(toast, error.message);
           }
         },
       },
@@ -287,15 +331,24 @@ export default function CheckoutDelivery(props) {
           title="Proceed to payment"
           onPress={() => {
             if (selectedAddress == null) {
-              Alert.alert(
-                'Select address',
-                'Please select an address to proceed.',
-              );
+              // Alert.alert(
+              //   'Select address',
+              //   'Please select an address to proceed.',
+              // );
+              ErrorToast(toast, 'Please select an address to proceed.');
+              return;
+            } else if (!rightDateTime.date) {
+              ErrorToast(toast, 'Please select an delivery date to proceed.');
+              return;
+            } else if (!rightDateTime.time) {
+              ErrorToast(toast, 'Please select an delivery time to proceed.');
               return;
             }
             props.navigation.navigate('CheckoutPayment', {
               address_id: allAddress[selectedAddress]?._id,
               checkout: checkout,
+              tod: selectedTime,
+              dod: selectedDate,
             });
           }}
         />
@@ -313,6 +366,7 @@ const AddressModal = ({
   address,
   update,
 }) => {
+  const toast = useToast();
   const [isLoading, setisLoading] = useState(false);
   const [addressData, setaddressData] = useState({
     address: null,
@@ -348,37 +402,50 @@ const AddressModal = ({
   }, [address?._id]);
   function validform() {
     if (!addressData?.name) {
-      Alert.alert('Please check', 'Name field is required.');
+      // Alert.alert('Please check');
+      ErrorToast(toast, 'Name field is required.');
+
       return false;
     }
     if (!addressData?.address) {
-      Alert.alert('Please check', 'Address field is required.');
+      // Alert.alert('Please check');
+      ErrorToast(toast, 'Address field is required.');
+
       return false;
     }
     if (!addressData?.landmark) {
-      Alert.alert('Please check', 'Landmark field is required.');
+      // Alert.alert('Please check');
+      ErrorToast(toast, 'Landmark field is required.');
+
       return false;
     }
     if (!addressData?.city) {
-      Alert.alert('Please check', 'City field is required.');
+      // Alert.alert('Please check');
+      ErrorToast(toast, 'City field is required.');
+
       return false;
     }
     if (!addressData?.state) {
-      Alert.alert('Please check', 'State field is required.');
+      // Alert.alert('Please check');
+      ErrorToast(toast, 'State field is required.');
+
       return false;
     }
     if (addressData?.pin_code?.length != 6) {
-      Alert.alert(
-        'Please check',
-        'Pin code is required and must be of 6 digit.',
-      );
+      // Alert.alert(
+      //   'Please check',
+      //   ,
+      // );
+      ErrorToast(toast, 'Pin code is required and must be of 6 digit.');
+
       return false;
     }
     if (addressData?.phone?.length != 10) {
-      Alert.alert(
-        'Please check',
-        'Mobile number is required and must be of 10 digit.',
-      );
+      // Alert.alert(
+      //   'Please check',
+      //   ,
+      // );
+      ErrorToast(toast, 'Mobile number is required and must be of 10 digit.');
       return false;
     }
 
@@ -394,7 +461,8 @@ const AddressModal = ({
         'address',
         {...addressData, state: '6185543d5dbef53480fb6ad9'}, // add a mongoid in state
         data => {
-          Alert.alert('Success', 'Address added successfully');
+          // Alert.alert('Success', );
+          SuccessToast(toast, 'Address added successfully');
           setModalVisible(false);
           setallAddress(data?.items);
           setisLoading(false);
@@ -435,14 +503,24 @@ const AddressModal = ({
       setisLoading(false);
 
       if (updateData?.status_code == 1) {
-        Alert.alert('Success', updateData?.mgs || updateData?.message);
+        // Alert.alert('Success', updateData?.mgs || updateData?.message);
+        SuccessToast(toast, updateData.mgs || updateData.message);
         setallAddress(updateData?.data?.items);
         setModalVisible(false);
       } else {
-        Alert.alert('Fail', updateData?.mgs || updateData?.message);
+        // Alert.alert('Fail', updateData?.mgs || updateData?.message);
+        ErrorToast(
+          toast,
+          updateData.mgs ||
+            updateData.message ||
+            updateData.error ||
+            JSON.stringify(updateData),
+        );
       }
     } catch (error) {
-      Alert.alert('Fail', error);
+      // Alert.alert('Fail', error);
+      ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+
       setisLoading(false);
     }
   }

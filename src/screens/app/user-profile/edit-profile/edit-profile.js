@@ -18,11 +18,14 @@ import instance from '../../../../axios';
 import AsyncStorage from '@react-native-community/async-storage';
 import AlertMsg from '../../../../components/alert-msg';
 import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
+import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
+import {useToast} from 'react-native-toast-notifications';
 
 export default function EditProfile(props) {
   const [user, setuser] = useGlobal('user');
   const [editedData, seteditedData] = useState(null);
   const [isEditing, setisEditing] = useState(false);
+  const toast = useToast();
   useEffect(() => {
     seteditedData(user);
     return () => {
@@ -43,10 +46,12 @@ export default function EditProfile(props) {
         res = res.data;
         console.log(res);
         if (res?.status_code == 1) {
-          AlertMsg(res?.message);
+          // AlertMsg(res?.message);
+          SuccessToast(toast, res.message);
           setuser(editedData);
         } else {
-          AlertMsg(res?.message);
+          // AlertMsg(res?.message);
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
         }
         setisEditing(false);
       });

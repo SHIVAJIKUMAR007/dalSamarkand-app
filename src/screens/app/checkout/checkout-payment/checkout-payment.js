@@ -20,12 +20,17 @@ import {COLORS} from '../../../../constants/colors';
 import GreyInputBox from '../../../../components/grey-input-box';
 import AlertMsg from '../../../../components/alert-msg';
 import AllInOneSDKManager from 'paytm_allinone_react-native';
+import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
+import {useToast} from 'react-native-toast-notifications';
 
 const {width} = Dimensions.get('window');
 export default function CheckoutPayment(props) {
+  const toast = useToast();
   const [user, setuser] = useGlobal('user');
   const [cart, setcart] = useGlobal('cart');
   let address_id = props.route?.params?.address_id;
+  let dod = props.route?.params?.dod;
+  let tod = props.route?.params?.tod;
   const [isSubmitting, setisSubmitting] = useState(false);
   const [checkout, setcheckout] = useState(null);
   const [discount, setdiscount] = useState({
@@ -57,8 +62,8 @@ export default function CheckoutPayment(props) {
       {coupon: orderDetail?.coupon},
       res => {
         console.log(res);
-        AlertMsg(res?.message);
-
+        // AlertMsg(res?.message);
+        SuccessToast(toast, res.message);
         setdiscount({
           value: res?.coupon_data?.doc?.value,
           type: res?.coupon_data?.doc?.type,
@@ -73,14 +78,17 @@ export default function CheckoutPayment(props) {
       },
       res => {
         console.log(res?.message);
-        AlertMsg(res?.message);
+        // AlertMsg(res?.message);
+        ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+
         // setorderDetail(pre => {
         //   return {...pre, coupon: null};
         // });
         setdiscount({value: 0, type: null, valueInRs: 0});
       },
       res => {
-        console.log(res);
+        // console.log(res);
+        ErrorToast(toast, res.message || res.error || JSON.stringify(res));
       },
       props.navigation,
       setuser,
@@ -95,14 +103,23 @@ export default function CheckoutPayment(props) {
     //   return;
     // }
     if (!orderDetail?.payment_type) {
-      Alert.alert('', 'Choose a payment method.');
+      // Alert.alert('', );
+      ErrorToast(toast, 'Choose a payment method.');
+
       return;
     }
     try {
+      // let dod=new Date()
+      // let tod=new Date()
+      // dod.setHour(tod.getHour())
+      dod.setHours(tod.getHours());
+      dod.setMinutes(tod.getMinutes());
+      console.log(dod);
+      // return;
       setisSubmitting(true);
       axiosPost(
         'order/place_order',
-        orderDetail,
+        {orderDetail, delivery_datetime: dod},
         data => {
           ////////////////// order is placed hence empty the cart //////////////////
           // console.log(data, 'dsjfsdfjksdlfjljk');
@@ -123,21 +140,24 @@ export default function CheckoutPayment(props) {
               .then(data => {
                 // handle success
 
-                Alert.alert(`Success`, 'Your payment is successfully done.');
-
+                // Alert.alert(`Success`, );
+                SuccessToast(toast, 'Your payment is successfully done.');
                 setisSubmitting(false);
                 props.navigation.navigate('ThankYou');
               })
               .catch(error => {
                 // handle failure
                 error = JSON.parse(error?.description)?.error?.description;
-                Alert.alert('Error', ` ${error}`);
+                // Alert.alert('Error', ` ${error}`);
+                ErrorToast(toast, error);
+
                 setisSubmitting(false);
               });
           }
           ///////////else cash on delivery
           else if (orderDetail?.payment_type == 'cod') {
             // Alert.alert('Success', data?.message);
+            SuccessToast(toast, 'You order is placed.');
             setisSubmitting(false);
             props.navigation.navigate('ThankYou');
           }
@@ -159,10 +179,11 @@ export default function CheckoutPayment(props) {
                   'paytmMID' + details?.mid,
                 )
                   .then(result => {
-                    Alert.alert(
-                      `Success`,
-                      'Your payment is successfully done.',
-                    );
+                    // Alert.alert(
+                    //   `Success`,
+                    //   ,
+                    // );
+                    SuccessToast(toast, 'Your payment is successfully done.');
                     console.log(result);
                     setisSubmitting(false);
                     props.navigation.navigate('ThankYou');
@@ -170,7 +191,8 @@ export default function CheckoutPayment(props) {
                   .catch(err => {
                     // handleError(err);
                     console.log(err);
-                    Alert.alert(`Fail`, 'Your payment is failed.');
+                    // Alert.alert(`Fail`, );
+                    ErrorToast(toast, 'Your payment is failed.');
 
                     setisSubmitting(false);
                   })
@@ -186,10 +208,11 @@ export default function CheckoutPayment(props) {
                   true,
                 )
                   .then(result => {
-                    Alert.alert(
-                      `Success`,
-                      'Your payment is successfully done.',
-                    );
+                    // Alert.alert(
+                    //   `Success`,
+                    //   ,
+                    // );
+                    SuccessToast(toast, 'Your payment is successfully done.');
                     console.log(result);
                     setisSubmitting(false);
                     props.navigation.navigate('ThankYou');
@@ -197,23 +220,29 @@ export default function CheckoutPayment(props) {
                   .catch(err => {
                     // handleError(err);
                     console.log(err);
-                    Alert.alert(`Fail`, 'Your payment is failed.');
+                    // Alert.alert(`Fail`, );
+                    ErrorToast(toast, 'Your payment is failed.');
 
                     setisSubmitting(false);
                   });
           } else {
             setisSubmitting(false);
-            Alert.alert('Error', `Please select a correct payment type`);
+            // Alert.alert('Error', );
+            ErrorToast(toast, `Please select a correct payment type`);
           }
         },
         res => {
           console.log(res);
-          Alert.alert('Fail', JSON.stringify(res));
+          // Alert.alert('Fail', JSON.stringify(res));
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+
           setisSubmitting(false);
         },
         res => {
           console.log(res);
-          Alert.alert('Fail', JSON.stringify(res));
+          // Alert.alert('Fail', JSON.stringify(res));
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+
           setisSubmitting(false);
         },
         props.navigation,
@@ -221,7 +250,8 @@ export default function CheckoutPayment(props) {
       );
     } catch (error) {
       console.log(error);
-      Alert.alert('Fail', error);
+      // Alert.alert('Fail', error);
+      ErrorToast(toast, error.message);
       setisSubmitting(false);
     }
   }
