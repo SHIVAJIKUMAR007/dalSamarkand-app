@@ -37,7 +37,7 @@ function success_handler({message}) {
 }
 
 function form_validation_handler(response) {
-  Alert.alert('Please check', JSON.stringify(response?.validation_errors));
+  Alert.alert('Please check', JSON.stringify(response));
 }
 async function axiosPost(
   url,
@@ -66,7 +66,9 @@ async function axiosPost(
             if (cb_error) cb_error(response);
             else
               err_handler(
-                response?.error ? response?.error : response?.message,
+                response?.message
+                  ? response?.message
+                  : response?.message || response,
                 url,
               );
             break;
@@ -107,7 +109,7 @@ async function axiosPost(
           invalid_user_handler(navigation, setuser);
         } else {
           if (cb_error) cb_error(err);
-          else err_handler(err, url + 'catch');
+          else err_handler(err.message, url + 'catch');
         }
       });
   });
@@ -126,7 +128,13 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
         switch (response.status_code) {
           case 0: {
             if (cb_error) cb_error(response?.error);
-            else err_handler(response?.error, url);
+            else
+              err_handler(
+                response?.message
+                  ? response?.message
+                  : response?.message || response,
+                url,
+              );
             break;
           }
           case 1: {
@@ -162,7 +170,7 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
           invalid_user_handler(navigation, setuser);
         } else {
           if (cb_error) cb_error(err);
-          else err_handler(err, url + 'catch');
+          else err_handler(err.message, url + 'catch');
         }
       });
   });

@@ -27,7 +27,7 @@ export default StyleSheet.create({
   },
 
   date: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: FONT_FAMILY.baskervilleOldFace,
     color: COLORS.BLACK,
     marginTop: 2.5,

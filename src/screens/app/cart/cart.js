@@ -27,7 +27,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {dalsamarkandCartId} from '../../../constants/appConstant';
 import AlertMsg from '../../../components/alert-msg';
 import StoreStateMsg from '../../../components/StoreStateMsg';
-import {ErrorToast} from '../../../components/CustmToast';
+import {ErrorToast, infoToast} from '../../../components/CustmToast';
 import {useToast} from 'react-native-toast-notifications';
 import {serverEndPoint} from '../../../config';
 
@@ -148,7 +148,7 @@ export default function Cart(props) {
                   });
                 else {
                   // AlertMsg);
-                  ErrorToast(toast, 'Please login to proceed further.');
+                  infoToast(toast, 'Please login to proceed further.');
                   props.navigation.navigate('SignIn');
                 }
               }}

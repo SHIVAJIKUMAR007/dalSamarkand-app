@@ -148,10 +148,11 @@ export default StyleSheet.create({
   },
 
   otherInfo: {
-    fontSize: 11,
+    fontSize: 12,
+    marginTop: 5,
     fontFamily: FONT_FAMILY.bellefair,
     color: '#9A9A9D',
-    textAlign: 'center',
+    // textAlign: 'center',
   },
 
   dividerCard: {

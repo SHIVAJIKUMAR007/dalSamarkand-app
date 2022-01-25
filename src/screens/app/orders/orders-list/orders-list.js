@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
+  Pressable,
 } from 'react-native';
 import CustomHeader from '../../../../components/custom-header';
 import styles from './style';
@@ -20,6 +21,10 @@ import {COLORS} from '../../../../constants/colors';
 import {FONT_FAMILY} from '../../../../constants/font-family';
 import {ActivityIndicator} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import {
+  dalDeliveredStatus,
+  dalOrderRecivedStatus,
+} from '../../../../constants/appConstant';
 
 const {height} = Dimensions.get('window');
 export default function OrdersList(props) {
@@ -32,6 +37,7 @@ export default function OrdersList(props) {
     axiosGet(
       'order',
       data => {
+        // console.log(data);
         setisLoading(false);
         setallOrders(data);
       },
@@ -99,13 +105,13 @@ export default function OrdersList(props) {
             <Text style={styles.heading}>No orders yet</Text>
 
             <Text style={styles.subHeading}>
-              Hit the orange button down below to Create an order
+              Hit the button down below to start ordering.
             </Text>
           </View>
           <View style={{padding: 25}}>
             <BrownBtn
               title="Start odering"
-              onPress={() => props.navigation.navigate('OrderStatus')}
+              onPress={() => props.navigation.navigate('HomeScreen')}
             />
           </View>
         </>
@@ -115,84 +121,156 @@ export default function OrdersList(props) {
 }
 
 function OneOrder({item, navigation}) {
-  // console.log(item);
+  // console.log(item?.order_status);
   // const {navigation} = useNavigationState();
   return (
     <>
-      <View
-        style={{
-          paddingHorizontal: 20,
-          marginVertical: 10,
-          borderTopColor: 'rgba(0,0,0,0.1)',
-          borderTopWidth: 15,
-          paddingTop: 20,
+      <Pressable
+        onPress={() => {
+          navigation.navigate('OrderStatus', {orderId: item?._id});
         }}>
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            paddingHorizontal: 20,
+            marginVertical: 10,
+            borderTopColor: 'rgba(0,0,0,0.1)',
+            borderTopWidth: 15,
+            paddingTop: 20,
           }}>
-          <View>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: '700',
-                fontFamily: FONT_FAMILY.baskervilleOldFace,
-              }}>
-              #OrderID
-            </Text>
-            <Text
-              style={{
-                fontSize: 13,
-                fontWeight: '300',
-                color: 'rgba(0,0,0,0.5)',
-                fontFamily: FONT_FAMILY.baskervilleOldFace,
-              }}>
-              {item?._id}
-            </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <View>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  fontFamily: FONT_FAMILY.baskervilleOldFace,
+                }}>
+                #OrderID
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: '300',
+                  color: 'rgba(0,0,0,0.5)',
+                  fontFamily: FONT_FAMILY.baskervilleOldFace,
+                }}>
+                {item?._id}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('OrderStatus', {orderId: item?._id});
+              }}
+              style={styles.borderBtn}>
+              <Text
+                style={{
+                  fontFamily: FONT_FAMILY.baskervilleOldFace,
+                }}>
+                Order Details
+              </Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('OrderStatus', {orderId: item?._id});
-            }}
-            style={styles.borderBtn}>
-            <Text
-              style={{
-                fontFamily: FONT_FAMILY.baskervilleOldFace,
-              }}>
-              Order Details
-            </Text>
-          </TouchableOpacity>
+
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '700',
+
+              fontFamily: FONT_FAMILY.baskervilleOldFace,
+              marginTop: 18,
+            }}>
+            Preparing To Pack 2 items
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: 'rgba(0,0,0,0.5)',
+
+              fontFamily: FONT_FAMILY.baskervilleOldFace,
+              marginVertical: 8,
+            }}>
+            We will process your order witthin 12-24 hours. Once processed we
+            will update the Estimated Delivery Date and Time.
+          </Text>
+          {/* <RatingSystem order={item} /> */}
+          <StepedTrack status={item?.order_status} />
         </View>
-
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: '700',
-
-            fontFamily: FONT_FAMILY.baskervilleOldFace,
-            marginTop: 18,
-          }}>
-          Preparing To Pack 2 items
-        </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            color: 'rgba(0,0,0,0.5)',
-
-            fontFamily: FONT_FAMILY.baskervilleOldFace,
-            marginVertical: 8,
-          }}>
-          We will process your order witthin 12-24 hours. Once processed we will
-          update the Estimated Delivery Date and Time.
-        </Text>
-        {/* <RatingSystem order={item} /> */}
-        <StepedTrack />
-      </View>
+      </Pressable>
     </>
   );
 }
+
+export const StepedTrack = ({status}) => {
+  const [statusMaster, setstatusMaster] = useState({});
+  // console.log(status?.title);
+  useEffect(() => {
+    if (status?._id == dalOrderRecivedStatus)
+      setstatusMaster({id: 1, title: status?.title});
+    else if (status?._id == dalDeliveredStatus)
+      setstatusMaster({id: 3, title: status?.title});
+    else setstatusMaster({id: 2, title: status?.title});
+
+    return () => {
+      setstatusMaster({});
+    };
+  }, [status?._id]);
+  return (
+    <>
+      <View style={styles.stepperContainer}>
+        {/* always active  */}
+        <View style={styles.activeCircle}>
+          <Feather name="check" color={COLORS.WHITE} size={20} />
+        </View>
+        {/* active line if id>1 */}
+        {statusMaster?.id > 1 ? (
+          <View style={styles.stepperCompletedLine} />
+        ) : (
+          <View style={styles.stepperLine} />
+        )}
+        {/* active circle if id>1 */}
+        {statusMaster?.id > 1 ? (
+          <View style={styles.activeCircle}>
+            <Feather name="check" color={COLORS.WHITE} size={20} />
+          </View>
+        ) : (
+          <View style={styles.circle}></View>
+        )}
+        {/* active line if id>2 */}
+        {statusMaster?.id > 2 ? (
+          <View style={styles.stepperCompletedLine} />
+        ) : (
+          <View style={styles.stepperLine} />
+        )}
+        {/* active circle if id>2 */}
+        {statusMaster?.id > 2 ? (
+          <View style={styles.activeCircle}>
+            <Feather name="check" color={COLORS.WHITE} size={20} />
+          </View>
+        ) : (
+          <View style={styles.circle}></View>
+        )}
+      </View>
+      <Text
+        style={{
+          fontFamily: FONT_FAMILY.baskervilleOldFace,
+          marginBottom: 10,
+          textAlign:
+            statusMaster?.id == 1
+              ? 'left'
+              : statusMaster?.id == 3
+              ? 'right'
+              : 'center',
+        }}>
+        {statusMaster?.title}
+      </Text>
+    </>
+  );
+};
 
 const RatingSystem = ({order}) => {
   const [rating, setrating] = useState(null);
@@ -251,21 +329,5 @@ const RatingSystem = ({order}) => {
         </View>
       </View>
     </>
-  );
-};
-
-const StepedTrack = () => {
-  return (
-    <View style={styles.stepperContainer}>
-      <View style={styles.activeCircle}>
-        <Feather name="check" color={COLORS.WHITE} size={20} />
-      </View>
-      <View style={styles.stepperCompletedLine} />
-      <View style={styles.activeCircle}>
-        <Feather name="check" color={COLORS.WHITE} size={20} />
-      </View>
-      <View style={styles.stepperLine} />
-      <View style={styles.circle}></View>
-    </View>
   );
 };

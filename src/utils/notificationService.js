@@ -9,8 +9,9 @@ export async function requestUserPermission() {
 
   if (enabled) {
     // console.log('Authorization status:', authStatus);
-    getfcmToken();
-  }
+    let token = await getfcmToken();
+    return token;
+  } else return null;
 }
 
 export const getfcmToken = async () => {
@@ -23,11 +24,14 @@ export const getfcmToken = async () => {
         // console.log(fcmToken + '->new fcm tokens');
         await AsyncStorage.setItem('dalSamarkandFcmToken', fcmToken);
       }
+      return fcmToken;
     } catch (error) {
       console.log(error, 'error in fcm tokens');
+      return null;
     }
   } else {
     // console.log('old token --->', token);
+    return token;
   }
 };
 

@@ -7,3 +7,5 @@ export const firstTimeThreeScreen = '%#*!oneTime3image#$@#$2';
 export const dalsamarkandJwtToken = '@#$dalsamarkandJwtToken*!H';
 export const dalsamarkandUser = '@#$dalsamarkandUser*!H';
 export const dalsamarkandCartId = '@#$dalsamarkandCartId*!H';
+export const dalOrderRecivedStatus = '61bd99d13ce13228cca18ee3';
+export const dalDeliveredStatus = '61c2d48c389adf00161c2fca';

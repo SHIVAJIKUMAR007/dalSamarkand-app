@@ -22,6 +22,7 @@ import {
 import AlertMsg from '../../../../components/alert-msg';
 import {useToast} from 'react-native-toast-notifications';
 import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
+import {requestUserPermission} from '../../../../utils/notificationService';
 
 export default function OtpVarification({navigation, route}) {
   let mobileNumber = route?.params?.mobileNumber;
@@ -67,8 +68,11 @@ export default function OtpVarification({navigation, route}) {
 
   async function submitOtp() {
     setisSubmitting(true);
-    let form = {phone: mobileNumber, code: otp};
+
     try {
+      let fcmToken = await requestUserPermission();
+      console.log(fcmToken, 'token');
+      let form = {phone: mobileNumber, code: otp, device_token: fcmToken};
       let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
       if (cartId) {
         form = {...form, cart_id: cartId};

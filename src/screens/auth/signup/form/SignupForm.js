@@ -37,15 +37,15 @@ export default function SignupForm(props) {
   const [isSubmitting, setisSubmitting] = useState(false);
   const [isValidForm, setisValidForm] = useState(false);
   const toast = useToast();
-  function validateFormConti(registerData) {
+  function validateFormConti(registerData, toggleCheckBox) {
     let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (
-      !registerData?.email.match(validEmailType) ||
+      !registerData?.email?.match(validEmailType) ||
       !registerData?.name ||
-      registerData?.phone.length != 10
+      registerData?.phone?.length != 10 ||
+      !toggleCheckBox
     ) {
       console.log('no');
-
       setisValidForm(false);
       return;
     }
@@ -113,6 +113,7 @@ export default function SignupForm(props) {
           // console.log(res, 'status 0');
           // Alert.alert('Error', res?.message);
           ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          setisSubmitting(false);
         },
         res => {
           // console.log(res);
@@ -122,6 +123,7 @@ export default function SignupForm(props) {
             errStr += `${error[key]} is duplicate`;
           }
           ErrorToast(toast, errStr);
+          setisSubmitting(false);
 
           // Alert.alert('Error', errStr);
         },
@@ -136,11 +138,12 @@ export default function SignupForm(props) {
     }
     setTimeout(() => {
       setisSubmitting(false);
-    }, 3000);
+    }, 5000);
   };
 
   const acceptTermsFunction = async newValue => {
     setToggleCheckBox(newValue);
+    validateFormConti(registerData, newValue);
     return;
     // if (Platform.OS != 'ios') {
     //   setToggleCheckBox(newValue);
@@ -212,10 +215,12 @@ export default function SignupForm(props) {
             onChangeText={text =>
               setregisterData(pre => {
                 pre = {...pre, name: text};
-                validateFormConti(pre);
+                validateFormConti(pre, toggleCheckBox);
                 return pre;
               })
             }
+            // onBlur={validateFormConti}
+            // onBlur={validateFormConti}
             placeholder="Name"
             borderBlack
           />
@@ -227,10 +232,11 @@ export default function SignupForm(props) {
               // text = text.toLowerCase();
               setregisterData(pre => {
                 pre = {...pre, email: text};
-                validateFormConti(pre);
+                validateFormConti(pre, toggleCheckBox);
                 return pre;
               });
             }}
+            // onBlur={validateFormConti}
             borderBlack
           />
           <InputBox
@@ -242,11 +248,12 @@ export default function SignupForm(props) {
             onChangeText={text =>
               setregisterData(pre => {
                 pre = {...pre, phone: text};
-                validateFormConti(pre);
+                validateFormConti(pre, toggleCheckBox);
                 return pre;
               })
             }
             borderBlack
+            // onBlur={validateFormConti}
             instruction="Mobile number must be of 10 digits."
           />
           {/* accept terms and conditions  */}

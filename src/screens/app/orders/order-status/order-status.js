@@ -19,6 +19,10 @@ import {IMAGES} from '../../../../constants/images';
 import {useGlobal} from 'reactn';
 import {axiosGet} from '../../../../axios';
 import {FONT_FAMILY} from '../../../../constants/font-family';
+import {serverEndPoint} from '../../../../config';
+import moment from 'moment';
+import {getBeautifullTimeFormate} from '../../../../utils/settings';
+import {StepedTrack} from '../orders-list/orders-list';
 
 const {height} = Dimensions.get('window');
 
@@ -58,82 +62,71 @@ export default function OrderStatus(props) {
           <View style={styles.card}>
             <View style={{flex: 3}}>
               <Text style={styles.otherInfo}>Date Purchased</Text>
-              <Text style={styles.date}>Fri, Oct 17, 2021</Text>
+              <Text style={styles.date}>
+                {moment(orderDetail?.createdAt).format('dddd, LL')}
+              </Text>
             </View>
             <View style={{flex: 1}}>
               <Feather name="chevron-right" color={COLORS.BLACK} size={24} />
             </View>
             <View style={{flex: 3}}>
               <Text style={styles.otherInfo}>Estimated Delivery</Text>
-              <Text style={styles.date}>Sun, Oct 19, 2021</Text>
+              <Text style={styles.date}>
+                {moment(orderDetail?.delivery_date?.date).format('dddd', 'LL')}
+              </Text>
+              <Text style={styles.date}>
+                {getBeautifullTimeFormate(
+                  orderDetail?.delivery_date?.hour,
+                  orderDetail?.delivery_date?.minute
+                    ? orderDetail?.delivery_date?.minute
+                    : 0,
+                )}
+              </Text>
             </View>
           </View>
 
-          <View style={styles.stepperContainer}>
-            <View style={styles.activeCircle}>
-              <Feather name="check" color={COLORS.WHITE} size={20} />
-            </View>
-            <View style={styles.stepperCompletedLine} />
-            <View style={styles.activeCircle}>
-              <Feather name="check" color={COLORS.WHITE} size={20} />
-            </View>
-            <View style={styles.stepperLine} />
-            <View style={styles.circle}></View>
-          </View>
+          <StepedTrack status={orderDetail?.order_status} />
 
-          <View style={{marginVertical: 20}}>
-            <View style={styles.orderStatusContainer}>
-              <Text style={styles.orderStatus}>
-                Fri, Oct 17, 201, 11:100 am
-              </Text>
-              <Text style={styles.orderStatus}>
-                Your order has been received
-              </Text>
-            </View>
-            <View style={styles.orderStatusContainer}>
-              <Text style={styles.orderStatus}>
-                Fri, Oct 17, 201, 11:100 am
-              </Text>
-              <Text style={styles.orderStatus}>
-                Your order has been processed
-              </Text>
-            </View>
-            <View style={styles.orderStatusContainer}>
-              <Text style={styles.orderStatus}>
-                Fri, Oct 18, 201, 11:100 am
-              </Text>
-              <Text style={styles.orderStatus}>Your order is on the way</Text>
-            </View>
-
-            <View style={{alignItems: 'center'}}>
-              <View style={styles.btn}>
-                <Feather name="map-pin" color={COLORS.WHITE} size={14} />
-                <Text style={styles.btnTxt}>Track My Order</Text>
-              </View>
-            </View>
-          </View>
           <View>
             <Text style={styles.heading}>Your Orders</Text>
             <View style={styles.divider} />
             {orderDetail?.cart?.map((cartItem, i) => (
-              <View style={styles.productCard} key={i}>
-                <View style={{flex: 1, justifyContent: 'space-between'}}>
-                  <Text style={styles.productName}>
-                    {cartItem?.productId?.title}
-                  </Text>
-                  <View>
-                    <Text style={styles.productPrice}>
-                      {cartItem?.price} each
+              <TouchableOpacity
+                key={i}
+                onPress={() => {
+                  props.navigation.navigate('ProductDetails', {
+                    productId: cartItem?.productId?._id,
+                  });
+                }}>
+                <View style={styles.productCard}>
+                  <View style={{flex: 1, justifyContent: 'space-between'}}>
+                    <Text style={styles.productName}>
+                      {cartItem?.productId?.title}
                     </Text>
-                    <Text style={styles.productQty}>
-                      Qty : {cartItem?.quantity}
-                    </Text>
+                    <View>
+                      <Text style={styles.productPrice}>
+                        {cartItem?.price} each
+                      </Text>
+                      <Text style={styles.productQty}>
+                        Qty : {cartItem?.quantity}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.imageContainer}>
+                    <Image
+                      style={styles.image}
+                      source={{
+                        uri:
+                          serverEndPoint +
+                          'uploads/images/products/' +
+                          (cartItem?.productId?.images?.length
+                            ? cartItem?.productId?.images[0]?.name
+                            : 'xyz.png'),
+                      }}
+                    />
                   </View>
                 </View>
-                <View style={styles.imageContainer}>
-                  <Image style={styles.image} source={IMAGES.PRODUCT} />
-                </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -214,3 +207,24 @@ const RatingSystem = ({order}) => {
     </>
   );
 };
+
+{
+  /* 
+          <View style={{marginVertical: 20}}>
+            <View style={styles.orderStatusContainer}>
+              <Text style={styles.orderStatus}>
+                Fri, Oct 17, 201, 11:100 am
+              </Text>
+              <Text style={styles.orderStatus}>
+                Your order has been received
+              </Text>
+            </View>
+
+            <View style={{alignItems: 'center'}}>
+              <View style={styles.btn}>
+                <Feather name="map-pin" color={COLORS.WHITE} size={14} />
+                <Text style={styles.btnTxt}>Track My Order</Text>
+              </View>
+            </View>
+          </View> */
+}

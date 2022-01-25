@@ -55,6 +55,9 @@ export default function CheckoutPayment(props) {
     };
   }, [address_id]);
   async function applyCoupon() {
+    if (!orderDetail?.coupon) {
+      return;
+    }
     try {
       axiosPost(
         'cart/apply_coupon',
@@ -277,72 +280,73 @@ export default function CheckoutPayment(props) {
             All transactions are secure and encrypted.
           </Text>
           {/* razor pay  */}
-          <View style={styles.card}>
-            <TouchableOpacity
-              onPress={() => {
-                setorderDetail(pre => {
-                  return {...pre, payment_type: 'razorpay'};
-                });
-              }}>
+          <TouchableOpacity
+            onPress={() => {
+              setorderDetail(pre => {
+                return {...pre, payment_type: 'razorpay'};
+              });
+            }}>
+            <View style={styles.card}>
               <View style={styles.circle}>
                 {orderDetail?.payment_type == 'razorpay' && (
                   <View style={styles.activeCircle} />
                 )}
               </View>
-            </TouchableOpacity>
-            <View style={{flex: 1}}>
-              <Text style={styles.name}>
-                Razorpay (Cards, UPI, NetBanking, Wallets)
-              </Text>
+              <View style={{flex: 1}}>
+                <Text style={styles.name}>
+                  Razorpay (Cards, UPI, NetBanking, Wallets)
+                </Text>
 
-              <Text style={styles.otherInfo}>
-                After clicking “Complete order”, you will be redirected to
-                Razorpay (Cards, UPI, NetBanking, Wallets) to complete your
-                purchase securely.
-              </Text>
+                <Text style={styles.otherInfo}>
+                  After clicking “Complete order”, you will be redirected to
+                  Razorpay (Cards, UPI, NetBanking, Wallets) to complete your
+                  purchase securely.
+                </Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
+
+          {/* </View> */}
           {/* paytm  */}
-          <View style={styles.card}>
-            <TouchableOpacity
-              onPress={() => {
-                setorderDetail(pre => {
-                  return {...pre, payment_type: 'paytm'};
-                });
-              }}>
+          <TouchableOpacity
+            onPress={() => {
+              setorderDetail(pre => {
+                return {...pre, payment_type: 'paytm'};
+              });
+            }}>
+            <View style={styles.card}>
               <View style={styles.circle}>
                 {orderDetail?.payment_type == 'paytm' && (
                   <View style={styles.activeCircle} />
                 )}
               </View>
-            </TouchableOpacity>
-            <View style={{flex: 1}}>
-              <Text style={styles.name}>Paytm</Text>
+              <View style={{flex: 1}}>
+                <Text style={styles.name}>Paytm</Text>
 
-              <Text style={styles.otherInfo}>
-                After clicking “Complete order”, you will be redirected to Paytm
-                app to complete your purchase securely.
-              </Text>
+                <Text style={styles.otherInfo}>
+                  After clicking “Complete order”, you will be redirected to
+                  Paytm app to complete your purchase securely.
+                </Text>
+              </View>
             </View>
-          </View>
-
-          <View style={styles.card}>
-            <TouchableOpacity
-              onPress={() => {
-                setorderDetail(pre => {
-                  return {...pre, payment_type: 'cod'};
-                });
-              }}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setorderDetail(pre => {
+                return {...pre, payment_type: 'cod'};
+              });
+            }}>
+            <View style={styles.card}>
               <View style={styles.circle}>
                 {orderDetail?.payment_type == 'cod' && (
                   <View style={styles.activeCircle} />
                 )}
               </View>
-            </TouchableOpacity>
-            <View style={{flex: 1}}>
-              <Text style={styles.name}>Cash on delivery</Text>
+              <View style={{flex: 1}}>
+                <Text style={styles.name}>Cash on delivery</Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
           {/* Apply coupon part  */}
           <Text style={[styles.subHeading, {marginVertical: 15}]}>
@@ -375,15 +379,14 @@ export default function CheckoutPayment(props) {
           <View style={{marginVertical: 15}}>
             <View style={styles.totalContainer}>
               <Text style={styles.subTotalHeading}>Subtotal</Text>
-              <Text style={styles.subTotal}>Rs. {checkout?.subTotal}</Text>
+              <Text style={styles.subTotal}>₹ {checkout?.subTotal}</Text>
             </View>
             <View style={{marginVertical: 2}} />
             <View style={styles.totalContainer}>
               <Text style={styles.devCharges}>Delivery Charges</Text>
               <Text style={styles.devTotal}>
-                Rs.{' '}
                 {checkout?.delivery_charges
-                  ? checkout?.delivery_charges
+                  ? '₹ ' + checkout?.delivery_charges
                   : 'Free'}
               </Text>
             </View>
@@ -393,14 +396,14 @@ export default function CheckoutPayment(props) {
                 Discount{' '}
                 {discount?.value
                   ? `(${orderDetail?.coupon} applied ${
-                      discount?.type == 'amount' ? '- Rs ' : ''
+                      discount?.type == 'amount' ? '- ₹ ' : ''
                     } ${discount?.value}${
                       discount?.type == 'amount' ? '' : '%'
                     })`
                   : '( No coupon applied )'}
               </Text>
               <Text style={styles.devTotal}>
-                {'-   '}Rs. {discount?.valueInRs}
+                {'-   '}₹ {discount?.valueInRs}
               </Text>
             </View>
           </View>
@@ -411,9 +414,9 @@ export default function CheckoutPayment(props) {
           </View>
 
           <Text style={styles.totalAmt}>
-            Rs.{' '}
+            ₹{' '}
             {checkout?.subTotal +
-              (checkout?.deleveryCharge ? checkout?.deleveryCharge : 0) -
+              (checkout?.delivery_charges ? checkout?.delivery_charges : 0) -
               discount?.valueInRs}
           </Text>
         </View>

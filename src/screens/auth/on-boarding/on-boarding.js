@@ -66,17 +66,29 @@ export default function OnBoarding(props) {
           />
         )}
         data={slides}
-        onDone={() => {
+        onDone={async () => {
+          await AsyncStorage.setItem(
+            firstTimeThreeScreen,
+            'seen one time before',
+          );
           props.navigation.navigate('HomeScreen');
         }}
         showSkipButton={true}
         showNextButton={true}
         showDoneButton={true}
-        onEndReached={() => {
+        onEndReached={async () => {
+          await AsyncStorage.setItem(
+            firstTimeThreeScreen,
+            'seen one time before',
+          );
           props.navigation.navigate('HomeScreen');
         }}
         renderPagination={() => null}
-        onSkip={() => {
+        onSkip={async () => {
+          await AsyncStorage.setItem(
+            firstTimeThreeScreen,
+            'seen one time before',
+          );
           props.navigation.navigate('HomeScreen');
         }}
         ref={ref => (slider.current = ref)}

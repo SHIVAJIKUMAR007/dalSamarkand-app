@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
-  TextInput,
   Platform,
 } from 'react-native';
 import styles from './style';
@@ -23,7 +22,7 @@ import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
 import {useToast} from 'react-native-toast-notifications';
 import {isHoliday, isStoreOnTime} from '../../../../utils/settings';
 import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
-import DropDownPicker from 'react-native-dropdown-picker';
+import PickerCompo from '../../../../components/PickerCompo';
 
 export default function CheckoutDelivery(props) {
   const [dod, setDod] = useState(moment().format('dddd, LL'));
@@ -106,7 +105,7 @@ export default function CheckoutDelivery(props) {
     axiosGet(
       'address',
       data => {
-        // console.log(data, ' =========> 59');
+        console.log(data, ' =========> 59');
         setallAddress(data?.items);
       },
       res => console.log(res),
@@ -216,7 +215,7 @@ export default function CheckoutDelivery(props) {
                   <Text style={styles.name}>{address?.name}</Text>
                   <View style={styles.divider} />
                   <Text style={styles.otherInfo}>
-                    {`${address?.address}, ${address?.landmark}, ${address?.city}, ${address?.state} - ${address?.pin_code}`}
+                    {`${address?.address}, ${address?.landmark}, ${address?.city?.name}, - ${address?.pin_code?.code}`}
                   </Text>
                   <View style={styles.divider} />
                   <Text style={styles.otherInfo}>+91 {address?.phone}</Text>
@@ -302,15 +301,14 @@ export default function CheckoutDelivery(props) {
             <View style={{marginVertical: 15}}>
               <View style={styles.totalContainer}>
                 <Text style={styles.subTotalHeading}>Subtotal</Text>
-                <Text style={styles.subTotal}>Rs. {checkout?.subTotal}</Text>
+                <Text style={styles.subTotal}>₹ {checkout?.subTotal}</Text>
               </View>
               <View style={{marginVertical: 2}} />
               <View style={styles.totalContainer}>
                 <Text style={styles.devCharges}>Delivery Charges</Text>
                 <Text style={styles.devTotal}>
-                  Rs.{' '}
                   {checkout?.delivery_charges
-                    ? checkout?.delivery_charges
+                    ? '₹ ' + checkout?.delivery_charges
                     : 'Free'}
                 </Text>
               </View>
@@ -322,7 +320,7 @@ export default function CheckoutDelivery(props) {
             </View>
 
             <Text style={styles.totalAmt}>
-              Rs.{' '}
+              ₹{' '}
               {checkout?.subTotal +
                 (checkout?.delivery_charges ? checkout?.delivery_charges : 0)}
             </Text>
@@ -388,22 +386,18 @@ const AddressModal = ({
   const [addressData, setaddressData] = useState({
     address: null,
     city: null,
-    state: null,
     pin_code: null,
     landmark: null,
     name: null,
     phone: null,
   });
-  const [opencity, setopencity] = useState(false);
-  const [openpin, setopenpin] = useState(false);
   const [allPin, setallPin] = useState([]);
   // console.log(address);
   useEffect(() => {
     setaddressData({
       address: address?.address ? address?.address : null,
-      city: address?.city ? address?.city : null,
-      state: address?.state ? address?.state : null,
-      pin_code: address?.pin_code ? address?.pin_code : null,
+      city: address?.city?._id ? address?.city?._id : null,
+      pin_code: address?.pin_code?._id ? address?.pin_code?._id : null,
       landmark: address?.landmark ? address?.landmark : null,
       name: address?.name ? address?.name : null,
       phone: address?.phone ? address?.phone : null,
@@ -445,18 +439,12 @@ const AddressModal = ({
 
       return false;
     }
-    if (!addressData?.state) {
-      // Alert.alert('Please check');
-      ErrorToast(toast, 'State field is required.');
-
-      return false;
-    }
-    if (addressData?.pin_code?.length != 6) {
+    if (!addressData?.pin_code) {
       // Alert.alert(
       //   'Please check',
       //   ,
       // );
-      ErrorToast(toast, 'Pin code is required and must be of 6 digit.');
+      ErrorToast(toast, 'Pin code is required');
 
       return false;
     }
@@ -545,18 +533,22 @@ const AddressModal = ({
     }
   }
   function getallPin(city_id) {
-    axiosGet(
-      'cityandpin/' + city_id,
-      res => {
-        res = res.map(r => {
-          return {label: r?.pin_code, value: r?._id};
-        });
-        setallPin(res);
-      },
-      res => ErrorToast(toast, res.message || res.error || JSON.stringify(res)),
-      null,
-      null,
-    );
+    console.log(city_id, 'hkjhkjjjhh');
+    if (city_id)
+      axiosGet(
+        'cityandpin/' + city_id,
+        res => {
+          console.log(res);
+          res = res.map(r => {
+            return {label: r?.code, value: r?._id};
+          });
+          setallPin(res);
+        },
+        res =>
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res)),
+        null,
+        null,
+      );
   }
   useEffect(() => {
     getallPin(addressData?.city);
@@ -614,32 +606,38 @@ const AddressModal = ({
                 }}
                 placeholder="Landmark"
               />
-              <DropDownPicker
-                open={opencity}
-                value={addressData?.city}
-                items={allCity}
-                setOpen={setopencity}
-                setValue={val =>
+              <PickerCompo
+                // showLabel="Time Slot"
+                // required
+                data={allCity}
+                selectedValue={addressData?.city}
+                onValueChange={val => {
+                  // getallPin(val);
                   setaddressData(pre => {
                     return {...pre, city: val};
-                  })
-                }
-                setItems={() => {}}
+                  });
+                }}
+                Placeholder="Select city"
+                noDataMassage="No city is found"
+                mode="dropdown"
               />
-
-              <DropDownPicker
-                open={openpin}
-                value={addressData?.pin_code}
-                items={allPin}
-                setOpen={setopenpin}
-                setValue={val =>
+              <View style={{height: 10}}></View>
+              <PickerCompo
+                // showLabel="Time Slot"
+                // required
+                data={allPin}
+                selectedValue={addressData?.pin_code}
+                onValueChange={val => {
                   setaddressData(pre => {
                     return {...pre, pin_code: val};
-                  })
-                }
-                setItems={() => {}}
+                  });
+                }}
+                Placeholder="Select Pin code"
+                noDataMassage="No pin code found"
+                mode="dropdown"
               />
-              <GreyInputBox
+
+              {/* <GreyInputBox
                 value={addressData?.city}
                 onChangeText={val => {
                   setaddressData(pre => {
@@ -667,7 +665,7 @@ const AddressModal = ({
                 keyboardType="numeric"
                 maxLength={6}
                 placeholder="Pincode"
-              />
+              /> */}
               <GreyInputBox
                 value={addressData?.phone?.toString()}
                 onChangeText={val => {

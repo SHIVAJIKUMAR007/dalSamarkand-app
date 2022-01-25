@@ -25,3 +25,16 @@ export const ErrorToast = (toast, error) => {
       animationType: 'slide-in',
     });
 };
+
+export const infoToast = (toast, info) => {
+  if (Platform.OS == 'ios') {
+    Alert.alert('Hey wait', info);
+  } else
+    toast.show(info, {
+      type: 'warning',
+      placement: 'bottom',
+      duration: 2500,
+      offset: 50,
+      animationType: 'slide-in',
+    });
+};

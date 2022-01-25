@@ -36,7 +36,7 @@ export default function AppNavigator() {
         setisFirstTime(true);
         console.log('seening first time now');
         SplashScreen.hide();
-        AsyncStorage.setItem(firstTimeThreeScreen, 'seen one time before');
+        // AsyncStorage.setItem(firstTimeThreeScreen, 'seen one time before');
       }
     }
     stater();

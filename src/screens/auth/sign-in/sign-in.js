@@ -22,6 +22,7 @@ import {axiosPost} from '../../../axios';
 import {useNavigation} from '@react-navigation/core';
 import {ErrorToast, SuccessToast} from '../../../components/CustmToast';
 import {useToast} from 'react-native-toast-notifications';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function SignIn(props) {
   const [phoneNo, setPhoneNo] = useState('');
@@ -46,7 +47,7 @@ export default function SignIn(props) {
       axiosPost(
         'auth/login',
         loginData,
-        response => {
+        async response => {
           SuccessToast(toast, response.message || JSON.stringify(response));
           // Alert.alert('Success', response.message);
           setisSubmitting(false);
@@ -135,7 +136,7 @@ export default function SignIn(props) {
           </Text>
           <ShadowBtn
             marginVertical={10}
-            // disabled={phoneNo.length < 10 ? true : false}
+            disabled={phoneNo.length < 10 ? true : false}
             isLoading={isSubmitting}
             title="Proceed via OTP"
             onPress={() => onSubmit()}

@@ -4,7 +4,7 @@ import instance, {axiosGet} from '../axios';
 import {ErrorToast} from '../components/CustmToast';
 import {dalsamarkandJwtToken} from '../constants/appConstant';
 
-const getBeautifullTimeFormate = (hour, minute) => {
+export const getBeautifullTimeFormate = (hour, minute) => {
   if (hour < 12) {
     return `${hour < 10 ? '0' + hour : hour}:${
       minute < 10 ? '0' + minute : minute
