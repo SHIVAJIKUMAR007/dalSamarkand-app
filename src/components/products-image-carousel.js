@@ -3,6 +3,7 @@ import Carousel from 'react-native-snap-carousel';
 import {View, Dimensions, StyleSheet, Image, Text} from 'react-native';
 import {COLORS} from '../constants/colors';
 import {IMAGES} from '../constants/images';
+import {serverEndPoint} from '../config';
 
 const {width} = Dimensions.get('window');
 
@@ -30,7 +31,13 @@ const RenderItem = ({item, banner}) => {
   return (
     <>
       <View style={styles.item} key={item.id}>
-        <Image source={IMAGES.PRODUCTS} style={styles.image} />
+        {/* ?IMAGES.PRODUCTS */}
+        <Image
+          source={{
+            uri: serverEndPoint + 'uploads/images/products/' + item?.name,
+          }}
+          style={styles.image}
+        />
       </View>
       <View style={styles.dotContainer}>
         {banner.map((data, i) => (

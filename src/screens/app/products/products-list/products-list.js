@@ -24,6 +24,7 @@ import {useGlobal} from 'reactn';
 import {useNavigation} from '@react-navigation/core';
 import {axiosGet} from '../../../../axios';
 import {addToCart, updateItemInCart} from '../../../../utils/cart';
+import {serverEndPoint} from '../../../../config';
 
 export default function ProductList(props) {
   const scrollViewRef = useRef();
@@ -169,7 +170,16 @@ const OneProduct = props => {
             productId: data?._id,
           })
         }>
-        <Image source={IMAGES.PRODUCT} style={styles.productImage} />
+        {/* source={IMAGES.PRODUCT} */}
+        <Image
+          source={{
+            uri:
+              serverEndPoint +
+              'uploads/images/products/' +
+              data?.images[0]?.name,
+          }}
+          style={styles.productImage}
+        />
       </Pressable>
 
       <View style={styles.productInfo}>

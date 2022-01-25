@@ -11,14 +11,12 @@ import {
 import styles from './style';
 import CustomHeader from '../../../../components/custom-header';
 import BrownBtn from '../../../../components/brown-btn';
-import LabelInputBox from '../../../../components/label-input-box';
 import {axiosPost} from '../../../../axios';
 import {useGlobal} from 'reactn';
 import RazorpayCheckout from 'react-native-razorpay';
 import {appLogo, appName} from '../../../../constants/appConstant';
 import {COLORS} from '../../../../constants/colors';
 import GreyInputBox from '../../../../components/grey-input-box';
-import AlertMsg from '../../../../components/alert-msg';
 import AllInOneSDKManager from 'paytm_allinone_react-native';
 import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
 import {useToast} from 'react-native-toast-notifications';
@@ -57,42 +55,56 @@ export default function CheckoutPayment(props) {
     };
   }, [address_id]);
   async function applyCoupon() {
-    axiosPost(
-      'cart/apply_coupon',
-      {coupon: orderDetail?.coupon},
-      res => {
-        console.log(res);
-        // AlertMsg(res?.message);
-        SuccessToast(toast, res.message);
-        setdiscount({
-          value: res?.coupon_data?.doc?.value,
-          type: res?.coupon_data?.doc?.type,
-          valueInRs:
-            res?.coupon_data?.doc?.type == 'amount'
-              ? res?.coupon_data?.doc?.value
-              : Math.floor(
-                  (res?.coupon_data?.doc?.value * checkout?.subTotal) / 100,
-                ),
-        });
-        // checkout.subTotal = checkout.subTotal - res?.coupon_data?.doc?.value;
-      },
-      res => {
-        console.log(res?.message);
-        // AlertMsg(res?.message);
-        ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+    try {
+      axiosPost(
+        'cart/apply_coupon',
+        {coupon: orderDetail?.coupon},
+        res => {
+          console.log(res);
+          // AlertMsg(res?.message);
+          SuccessToast(toast, res.message);
+          setdiscount({
+            value: res?.coupon_data?.doc?.value,
+            type: res?.coupon_data?.doc?.type,
+            valueInRs:
+              res?.coupon_data?.doc?.type == 'amount'
+                ? res?.coupon_data?.doc?.value
+                : Math.floor(
+                    (res?.coupon_data?.doc?.value * checkout?.subTotal) / 100,
+                  ),
+          });
+          // checkout.subTotal = checkout.subTotal - res?.coupon_data?.doc?.value;
+        },
+        res => {
+          console.log(res?.message);
+          // AlertMsg(res?.message);
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
 
-        // setorderDetail(pre => {
-        //   return {...pre, coupon: null};
-        // });
-        setdiscount({value: 0, type: null, valueInRs: 0});
-      },
-      res => {
-        // console.log(res);
-        ErrorToast(toast, res.message || res.error || JSON.stringify(res));
-      },
-      props.navigation,
-      setuser,
-    );
+          setorderDetail(pre => {
+            return {...pre, coupon: null};
+          });
+          setdiscount({value: 0, type: null, valueInRs: 0});
+        },
+        res => {
+          // console.log(res);
+          setorderDetail(pre => {
+            return {...pre, coupon: null};
+          });
+          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+        },
+        props.navigation,
+        setuser,
+      );
+    } catch (error) {
+      console.log(error?.message);
+      // AlertMsg(error?.message);
+      ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+
+      setorderDetail(pre => {
+        return {...pre, coupon: null};
+      });
+      setdiscount({value: 0, type: null, valueInRs: 0});
+    }
   }
   async function handleOrder() {
     // if (orderDetail?.payment_type == 'paytm') {
@@ -112,14 +124,14 @@ export default function CheckoutPayment(props) {
       // let dod=new Date()
       // let tod=new Date()
       // dod.setHour(tod.getHour())
-      dod.setHours(tod.getHours());
-      dod.setMinutes(tod.getMinutes());
-      console.log(dod);
+      // dod.setHours(tod.getHours());
+      // dod.setMinutes(tod.getMinutes());
+      // console.log(dod);
       // return;
       setisSubmitting(true);
       axiosPost(
         'order/place_order',
-        {orderDetail, delivery_datetime: dod},
+        {...orderDetail, delivery_date: dod, delivery_hour: tod.getHours()},
         data => {
           ////////////////// order is placed hence empty the cart //////////////////
           // console.log(data, 'dsjfsdfjksdlfjljk');

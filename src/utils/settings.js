@@ -139,7 +139,7 @@ export const getSettings = async setsettings => {
       }
       setsettings(pre => {
         pre = {...pre, todayOn, holidays};
-        console.log(pre, 'holidays');
+        // console.log(pre, 'holidays');
         return pre;
       });
     },

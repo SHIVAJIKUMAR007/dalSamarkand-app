@@ -8,6 +8,7 @@ import {
   Modal,
   Alert,
   TextInput,
+  Platform,
 } from 'react-native';
 import styles from './style';
 import CustomHeader from '../../../../components/custom-header';
@@ -22,6 +23,7 @@ import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
 import {useToast} from 'react-native-toast-notifications';
 import {isHoliday, isStoreOnTime} from '../../../../utils/settings';
 import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function CheckoutDelivery(props) {
   const [dod, setDod] = useState(moment().format('dddd, LL'));
@@ -37,6 +39,7 @@ export default function CheckoutDelivery(props) {
   const [updateNotAdd, setupdateNotAdd] = useState(false);
   const [updateAddressIndex, setupdateAddressIndex] = useState(null);
   const [checkout, setcheckout] = useState({});
+  const [allCity, setallCity] = useState({});
   const [user, setuser] = useGlobal('user');
   const toast = useToast();
   const onChange = async (event, selectedDate) => {
@@ -47,12 +50,12 @@ export default function CheckoutDelivery(props) {
     let result = await isHoliday(toast, currentDate);
     // console.log(date_format, currentDate, result);
 
-    if (event.type === 'set' && result == 1) {
+    if ((Platform.OS == 'ios' || event.type == 'set') && result == 1) {
       setDod(date_format);
       setrightDateTime(pre => {
         return {...pre, date: true};
       });
-    } else if (event.type === 'set' && result == 0) {
+    } else if ((Platform.OS == 'ios' || event.type == 'set') && result == 0) {
       setDod('Select date of delivery');
       setrightDateTime(pre => {
         return {...pre, date: false};
@@ -79,14 +82,14 @@ export default function CheckoutDelivery(props) {
     setShowTime(Platform.OS === 'ios');
     let time_format = moment(currTime).format('LT');
     setTime(currTime);
-    let result = isStoreOnTime(toast, currTime);
+    let result = await isStoreOnTime(toast, currTime);
     console.log(time_format, currTime, result);
-    if (event.type === 'set' && result == 1) {
+    if ((Platform.OS == 'ios' || event.type == 'set') && result == 1) {
       setTod(time_format);
       setrightDateTime(pre => {
         return {...pre, time: true};
       });
-    } else if (event.type === 'set' && result == 0) {
+    } else if ((Platform.OS == 'ios' || event.type == 'set') && result == 0) {
       setTod('Select time of delivery');
       setrightDateTime(pre => {
         return {...pre, time: false};
@@ -105,6 +108,18 @@ export default function CheckoutDelivery(props) {
       data => {
         // console.log(data, ' =========> 59');
         setallAddress(data?.items);
+      },
+      res => console.log(res),
+      props.navigation,
+      setuser,
+    );
+    axiosGet(
+      'cityandpin',
+      data => {
+        data = data.map(d => {
+          return {label: d?.name, value: d?._id};
+        });
+        setallCity(data);
       },
       res => console.log(res),
       props.navigation,
@@ -323,6 +338,7 @@ export default function CheckoutDelivery(props) {
             updateNotAdd ? allAddress[parseInt(updateAddressIndex)] : null
           }
           update={updateNotAdd}
+          allCity={allCity}
         />
       </ScrollView>
 
@@ -347,8 +363,8 @@ export default function CheckoutDelivery(props) {
             props.navigation.navigate('CheckoutPayment', {
               address_id: allAddress[selectedAddress]?._id,
               checkout: checkout,
-              tod: selectedTime,
-              dod: selectedDate,
+              tod: time,
+              dod: date,
             });
           }}
         />
@@ -365,6 +381,7 @@ const AddressModal = ({
   setallAddress,
   address,
   update,
+  allCity,
 }) => {
   const toast = useToast();
   const [isLoading, setisLoading] = useState(false);
@@ -377,6 +394,9 @@ const AddressModal = ({
     name: null,
     phone: null,
   });
+  const [opencity, setopencity] = useState(false);
+  const [openpin, setopenpin] = useState(false);
+  const [allPin, setallPin] = useState([]);
   // console.log(address);
   useEffect(() => {
     setaddressData({
@@ -524,7 +544,26 @@ const AddressModal = ({
       setisLoading(false);
     }
   }
-
+  function getallPin(city_id) {
+    axiosGet(
+      'cityandpin/' + city_id,
+      res => {
+        res = res.map(r => {
+          return {label: r?.pin_code, value: r?._id};
+        });
+        setallPin(res);
+      },
+      res => ErrorToast(toast, res.message || res.error || JSON.stringify(res)),
+      null,
+      null,
+    );
+  }
+  useEffect(() => {
+    getallPin(addressData?.city);
+    return () => {
+      setallPin([]);
+    };
+  }, [addressData?.city]);
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -574,6 +613,31 @@ const AddressModal = ({
                   });
                 }}
                 placeholder="Landmark"
+              />
+              <DropDownPicker
+                open={opencity}
+                value={addressData?.city}
+                items={allCity}
+                setOpen={setopencity}
+                setValue={val =>
+                  setaddressData(pre => {
+                    return {...pre, city: val};
+                  })
+                }
+                setItems={() => {}}
+              />
+
+              <DropDownPicker
+                open={openpin}
+                value={addressData?.pin_code}
+                items={allPin}
+                setOpen={setopenpin}
+                setValue={val =>
+                  setaddressData(pre => {
+                    return {...pre, pin_code: val};
+                  })
+                }
+                setItems={() => {}}
               />
               <GreyInputBox
                 value={addressData?.city}

@@ -25,6 +25,7 @@ import {
   dalsamarkandJwtToken,
 } from '../../../constants/appConstant';
 import StoreStateMsg from '../../../components/StoreStateMsg';
+import {serverEndPoint} from '../../../config';
 
 export default function HomeScreen(props) {
   const scrollViewRef = useRef();
@@ -268,7 +269,16 @@ const OneProduct = ({data, navigation}) => {
             productId: data?._id,
           });
         }}>
-        <Image source={IMAGES.PRODUCT} style={styles.productImage} />
+        {/* source={IMAGES.PRODUCT}  */}
+        <Image
+          source={{
+            uri:
+              serverEndPoint +
+              'uploads/images/products/' +
+              data?.images[0]?.name,
+          }}
+          style={styles.productImage}
+        />
         <Text style={styles.productName}>
           {data?.title} (Order Lead Time- 24 Hours)
         </Text>

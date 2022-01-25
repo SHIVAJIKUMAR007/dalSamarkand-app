@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Text, Platform} from 'react-native';
 import {COLORS} from '../constants/colors';
 import {FONT_FAMILY} from '../constants/font-family';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -15,7 +15,7 @@ export default function TimeDatePicker(props) {
             <DateTimePicker
               value={props.value}
               mode={props.mode}
-              display="default"
+              display={Platform.OS == 'ios' ? 'compact' : 'default'}
               onChange={props.onChange}
             />
           )}

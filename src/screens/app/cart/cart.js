@@ -28,6 +28,8 @@ import {dalsamarkandCartId} from '../../../constants/appConstant';
 import AlertMsg from '../../../components/alert-msg';
 import StoreStateMsg from '../../../components/StoreStateMsg';
 import {ErrorToast} from '../../../components/CustmToast';
+import {useToast} from 'react-native-toast-notifications';
+import {serverEndPoint} from '../../../config';
 
 export default function Cart(props) {
   const [cart, setcart] = useGlobal('cart');
@@ -35,6 +37,7 @@ export default function Cart(props) {
   const [checkout, setcheckout] = useState(null);
   const [isLoading, setisLoading] = useState(false);
   const [isUpdatingCart, setisUpdatingCart] = useState(false);
+  const toast = useToast();
   const getUnauthCart = async () => {
     let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
     // console.log(cartId, 'cartid in cart');
@@ -175,6 +178,7 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
 
   useEffect(() => {
     setcartItem(data?.productId);
+    console.log(data?.productId);
     setqty(data?.quantity);
     return () => {
       setcartItem(null);
@@ -238,7 +242,16 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
     <View>
       <View style={styles.card}>
         <View style={styles.imageContainer}>
-          <Image style={styles.productImage} source={IMAGES.PRODUCT} />
+          {/* IMAGES.PRODUCT */}
+          <Image
+            style={styles.productImage}
+            source={{
+              uri:
+                serverEndPoint +
+                'uploads/images/products/' +
+                cartItem?.images[0]?.name,
+            }}
+          />
         </View>
         <View style={styles.productInfoContainer}>
           <View style={styles.qtyBtnContainer}>
