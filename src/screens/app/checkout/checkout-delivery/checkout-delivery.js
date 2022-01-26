@@ -41,12 +41,16 @@ export default function CheckoutDelivery(props) {
   const [allCity, setallCity] = useState({});
   const [user, setuser] = useGlobal('user');
   const toast = useToast();
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
+
   const onChange = async (event, selectedDate) => {
     let currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
     let date_format = moment(currentDate).format('dddd, LL');
     setDate(currentDate);
-    let result = await isHoliday(toast, currentDate);
+    let result = await isHoliday(toast, currentDate, seterrorAlert);
     // console.log(date_format, currentDate, result);
 
     if ((Platform.OS == 'ios' || event.type == 'set') && result == 1) {
@@ -59,11 +63,11 @@ export default function CheckoutDelivery(props) {
       setrightDateTime(pre => {
         return {...pre, date: false};
       });
-
-      ErrorToast(
-        toast,
-        date_format + ' is holiday and our delivery services will be closed.',
-      );
+      seterrorAlert({
+        visible: true,
+        message:
+          date_format + ' is holiday and our delivery services will be closed.',
+      });
     } else {
       setDod('Select date of delivery');
       setrightDateTime(pre => {
@@ -81,7 +85,7 @@ export default function CheckoutDelivery(props) {
     setShowTime(Platform.OS === 'ios');
     let time_format = moment(currTime).format('LT');
     setTime(currTime);
-    let result = await isStoreOnTime(toast, currTime);
+    let result = await isStoreOnTime(toast, currTime, seterrorAlert);
     console.log(time_format, currTime, result);
     if ((Platform.OS == 'ios' || event.type == 'set') && result == 1) {
       setTod(time_format);
@@ -160,16 +164,31 @@ export default function CheckoutDelivery(props) {
 
             if (deleteMsg?.status_code == 1) {
               // Alert.alert('Success');
-              SuccessToast(toast, deleteMsg?.mgs || deleteMsg?.message);
+              // SuccessToast(toast, deleteMsg?.mgs || deleteMsg?.message);
+              setsuccessAlert({
+                visible: true,
+                message:
+                  deleteMsg.message ||
+                  deleteMsg.error ||
+                  JSON.stringify(deleteMsg),
+              });
 
               setallAddress(deleteMsg?.data?.items);
             } else {
               // Alert.alert('Fail');
-              ErrorToast(toast, deleteMsg?.mgs || deleteMsg?.message);
+              seterrorAlert({
+                visible: true,
+                message: deleteMsg?.mgs || deleteMsg?.message,
+              });
+              // ErrorToast(toast, );
             }
           } catch (error) {
             // Alert.alert('Fail', error);
-            ErrorToast(toast, error.message);
+            // ErrorToast(toast, error.message);
+            seterrorAlert({
+              visible: true,
+              message: error.message || error.error || JSON.stringify(error),
+            });
           }
         },
       },
@@ -274,30 +293,6 @@ export default function CheckoutDelivery(props) {
               label="Select time of delivery"
               mode={'time'}
             />
-            {/* <Text style={[styles.subHeading, {marginVertical: 15}]}>
-              Apply Coupon
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <GreyInputBox
-                placeholder="Enter a valid coupon code"
-                style={{flex: 1}}
-                value={couponCode}
-                onChangeText={val => {
-                  setcouponCode(val);
-                }}
-              />
-              <TouchableOpacity
-                onPress={applyCoupon}
-                style={[styles.addAddressBtn, {marginBottom: 0, padding: 15}]}>
-                <Text style={styles.addAddressBtnText}>Apply</Text>
-              </TouchableOpacity>
-            </View> */}
-
             <View style={{marginVertical: 15}}>
               <View style={styles.totalContainer}>
                 <Text style={styles.subTotalHeading}>Subtotal</Text>
@@ -343,21 +338,22 @@ export default function CheckoutDelivery(props) {
       <View style={styles.bottomBtn}>
         <BrownBtn
           title="Proceed to payment"
+          disabled={
+            selectedAddress == null ||
+            !rightDateTime.date ||
+            !rightDateTime.time
+          }
           onPress={() => {
-            if (selectedAddress == null) {
-              // Alert.alert(
-              //   'Select address',
-              //   'Please select an address to proceed.',
-              // );
-              ErrorToast(toast, 'Please select an address to proceed.');
-              return;
-            } else if (!rightDateTime.date) {
-              ErrorToast(toast, 'Please select an delivery date to proceed.');
-              return;
-            } else if (!rightDateTime.time) {
-              ErrorToast(toast, 'Please select an delivery time to proceed.');
-              return;
-            }
+            // if (
+
+            // ) {
+            //   console.log(
+            //     selectedAddress,
+            //     !rightDateTime.date,
+            //     !rightDateTime.time,
+            //   );
+            //   return;
+            // }
             props.navigation.navigate('CheckoutPayment', {
               address_id: allAddress[selectedAddress]?._id,
               checkout: checkout,
@@ -383,6 +379,11 @@ const AddressModal = ({
 }) => {
   const toast = useToast();
   const [isLoading, setisLoading] = useState(false);
+
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
+
   const [addressData, setaddressData] = useState({
     address: null,
     city: null,
@@ -392,6 +393,7 @@ const AddressModal = ({
     phone: null,
   });
   const [allPin, setallPin] = useState([]);
+  const [isFormValid, setisFormValid] = useState(false);
   // console.log(address);
   useEffect(() => {
     setaddressData({
@@ -414,28 +416,28 @@ const AddressModal = ({
       });
     };
   }, [address?._id]);
-  function validform() {
+  function validform(addressData) {
     if (!addressData?.name) {
       // Alert.alert('Please check');
-      ErrorToast(toast, 'Name field is required.');
+      // ErrorToast(toast, 'Name field is required.');
 
       return false;
     }
     if (!addressData?.address) {
       // Alert.alert('Please check');
-      ErrorToast(toast, 'Address field is required.');
+      // ErrorToast(toast, 'Address field is required.');
 
       return false;
     }
     if (!addressData?.landmark) {
       // Alert.alert('Please check');
-      ErrorToast(toast, 'Landmark field is required.');
+      // ErrorToast(toast, 'Landmark field is required.');
 
       return false;
     }
     if (!addressData?.city) {
       // Alert.alert('Please check');
-      ErrorToast(toast, 'City field is required.');
+      // ErrorToast(toast, 'City field is required.');
 
       return false;
     }
@@ -444,7 +446,7 @@ const AddressModal = ({
       //   'Please check',
       //   ,
       // );
-      ErrorToast(toast, 'Pin code is required');
+      // ErrorToast(toast, 'Pin code is required');
 
       return false;
     }
@@ -453,7 +455,7 @@ const AddressModal = ({
       //   'Please check',
       //   ,
       // );
-      ErrorToast(toast, 'Mobile number is required and must be of 10 digit.');
+      // ErrorToast(toast, 'Mobile number is required and must be of 10 digit.');
       return false;
     }
 
@@ -461,23 +463,26 @@ const AddressModal = ({
   }
 
   function addAddress() {
-    // console.log(addressData);
-    if (!validform()) return;
+    console.log(addressData);
     setisLoading(true);
     try {
       axiosPost(
         'address',
-        {...addressData, state: '6185543d5dbef53480fb6ad9'}, // add a mongoid in state
+        addressData, // add a mongoid in state
         data => {
+          console.log(data);
           // Alert.alert('Success', );
-          SuccessToast(toast, 'Address added successfully');
+          // SuccessToast(toast, );
+          setsuccessAlert({
+            visible: true,
+            message: 'Address added successfully',
+          });
           setModalVisible(false);
           setallAddress(data?.items);
           setisLoading(false);
           setaddressData({
             address: null,
             city: null,
-            state: null,
             pin_code: null,
             landmark: null,
             name: null,
@@ -512,23 +517,33 @@ const AddressModal = ({
 
       if (updateData?.status_code == 1) {
         // Alert.alert('Success', updateData?.mgs || updateData?.message);
-        SuccessToast(toast, updateData.mgs || updateData.message);
+        // SuccessToast(toast, );
+        setsuccessAlert({
+          visible: true,
+          message: updateData.mgs || updateData.message,
+        });
+
         setallAddress(updateData?.data?.items);
         setModalVisible(false);
       } else {
         // Alert.alert('Fail', updateData?.mgs || updateData?.message);
-        ErrorToast(
-          toast,
-          updateData.mgs ||
+
+        seterrorAlert({
+          visible: true,
+          message:
+            updateData.mgs ||
             updateData.message ||
             updateData.error ||
             JSON.stringify(updateData),
-        );
+        });
       }
     } catch (error) {
       // Alert.alert('Fail', error);
-      ErrorToast(toast, error.message || error.error || JSON.stringify(error));
-
+      // ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+      seterrorAlert({
+        visible: true,
+        message: error.message || error.error || JSON.stringify(error),
+      });
       setisLoading(false);
     }
   }
@@ -545,7 +560,11 @@ const AddressModal = ({
           setallPin(res);
         },
         res =>
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res)),
+          // ErrorToast(toast, res.message || res.error || JSON.stringify(res))
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          }),
         null,
         null,
       );
@@ -585,6 +604,7 @@ const AddressModal = ({
                     return {...pre, name: val};
                   });
                 }}
+                onBlur={() => setisFormValid(validform(addressData))}
                 placeholder="Name"
               />
 
@@ -595,6 +615,7 @@ const AddressModal = ({
                     return {...pre, address: val};
                   });
                 }}
+                onBlur={() => setisFormValid(validform(addressData))}
                 placeholder="Address"
               />
               <GreyInputBox
@@ -604,6 +625,7 @@ const AddressModal = ({
                     return {...pre, landmark: val};
                   });
                 }}
+                onBlur={() => setisFormValid(validform(addressData))}
                 placeholder="Landmark"
               />
               <PickerCompo
@@ -614,7 +636,9 @@ const AddressModal = ({
                 onValueChange={val => {
                   // getallPin(val);
                   setaddressData(pre => {
-                    return {...pre, city: val};
+                    pre = {...pre, city: val};
+                    setisFormValid(validform(pre));
+                    return pre;
                   });
                 }}
                 Placeholder="Select city"
@@ -629,48 +653,22 @@ const AddressModal = ({
                 selectedValue={addressData?.pin_code}
                 onValueChange={val => {
                   setaddressData(pre => {
-                    return {...pre, pin_code: val};
+                    pre = {...pre, pin_code: val};
+                    setisFormValid(validform(pre));
+                    return pre;
                   });
                 }}
                 Placeholder="Select Pin code"
                 noDataMassage="No pin code found"
                 mode="dropdown"
               />
-
-              {/* <GreyInputBox
-                value={addressData?.city}
-                onChangeText={val => {
-                  setaddressData(pre => {
-                    return {...pre, city: val};
-                  });
-                }}
-                placeholder="City"
-              />
-              <GreyInputBox
-                value={addressData?.state}
-                onChangeText={val => {
-                  setaddressData(pre => {
-                    return {...pre, state: val};
-                  });
-                }}
-                placeholder="State"
-              />
-              <GreyInputBox
-                value={addressData?.pin_code?.toString()}
-                onChangeText={val => {
-                  setaddressData(pre => {
-                    return {...pre, pin_code: val};
-                  });
-                }}
-                keyboardType="numeric"
-                maxLength={6}
-                placeholder="Pincode"
-              /> */}
               <GreyInputBox
                 value={addressData?.phone?.toString()}
                 onChangeText={val => {
                   setaddressData(pre => {
-                    return {...pre, phone: val};
+                    pre = {...pre, phone: val};
+                    setisFormValid(validform(pre));
+                    return pre;
                   });
                 }}
                 keyboardType="numeric"
@@ -679,7 +677,8 @@ const AddressModal = ({
               />
               <View style={{marginVertical: 10}}>
                 <BrownBtn
-                  disabled={isLoading}
+                  disabled={!isFormValid}
+                  isLoading={isLoading}
                   title={update ? 'Update Address' : 'Save Address'}
                   onPress={() => {
                     update ? updateAddress() : addAddress();

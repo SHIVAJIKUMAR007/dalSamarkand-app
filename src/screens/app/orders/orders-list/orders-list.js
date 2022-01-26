@@ -133,8 +133,10 @@ function OneOrder({item, navigation}) {
           style={{
             paddingHorizontal: 20,
             marginVertical: 10,
+            borderBottomColor: 'rgba(0,0,0,0.1)',
             borderTopColor: 'rgba(0,0,0,0.1)',
-            borderTopWidth: 15,
+            borderBottomWidth: 7.5,
+            borderTopWidth: 7.5,
             paddingTop: 20,
           }}>
           <View

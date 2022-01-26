@@ -48,7 +48,7 @@ const elabSettings = async (data, setsettings) => {
   } else {
     // time is between openinig and closing time
     offHours = offHours.map(oh => oh.hour);
-    console.log(offHours, hour);
+    // console.log(offHours, hour);
     offHours.sort((a, b) => {
       return a - b;
     });
@@ -106,7 +106,7 @@ const elabSettings = async (data, setsettings) => {
 
   setsettings(pre => {
     pre = {...pre, currOn, onMessage, offMessage, settings: data};
-    console.log(pre, 'gghhjghj');
+    // console.log(pre, 'gghhjghj');
     return pre;
   });
 
@@ -160,7 +160,7 @@ export const getSettings = async setsettings => {
   );
 };
 
-export const isHoliday = async (toast, selectedDate) => {
+export const isHoliday = async (toast, selectedDate, seterrorAlert) => {
   try {
     let token = await AsyncStorage.getItem(dalsamarkandJwtToken);
     let holidays = await instance.get('holiday', {
@@ -171,10 +171,10 @@ export const isHoliday = async (toast, selectedDate) => {
     });
     holidays = await holidays.data;
     if (holidays.status_code != 1) {
-      ErrorToast(
-        toast,
-        holidays.message || holidays.error || JSON.stringify(holidays),
-      );
+      seterrorAlert({
+        visible: true,
+        message: holidays.message || holidays.error || JSON.stringify(holidays),
+      });
       return -1;
     }
     holidays = holidays?.data?.map(hl => hl.date);
@@ -199,12 +199,15 @@ export const isHoliday = async (toast, selectedDate) => {
     return todayOn;
   } catch (error) {
     console.log(error);
-    ErrorToast(toast, error.message);
+    seterrorAlert({
+      visible: true,
+      message: error.message || error.error || JSON.stringify(error),
+    });
     return -1;
   }
 };
 
-export const isStoreOnTime = async (toast, selectedTime) => {
+export const isStoreOnTime = async (toast, selectedTime, seterrorAlert) => {
   try {
     let token = await AsyncStorage.getItem(dalsamarkandJwtToken);
     let settings = await instance.get('settings', {
@@ -215,10 +218,14 @@ export const isStoreOnTime = async (toast, selectedTime) => {
     });
     settings = await settings.data;
     if (settings.status_code != 1) {
-      ErrorToast(
-        toast,
-        settings.message || settings.error || JSON.stringify(settings),
-      );
+      // ErrorToast(
+      //   toast,
+      //   settings.message || settings.error || JSON.stringify(settings),
+      // );
+      seterrorAlert({
+        visible: true,
+        message: settings.message || settings.error || JSON.stringify(settings),
+      });
       return -1;
     }
     let data = settings.data;
@@ -234,22 +241,25 @@ export const isStoreOnTime = async (toast, selectedTime) => {
     if (hour < ot?.hour || (hour == ot?.hour && minute < ot?.minutes)) {
       // store is not opened yet
       console.log('store is not opened yet');
-      ErrorToast(
-        toast,
-        'Our delivery services will be open after ' +
-          getBeautifullTimeFormate(ot?.hour, ot.minutes),
-      );
 
+      seterrorAlert({
+        visible: true,
+        message:
+          'Our delivery services will be open after ' +
+          getBeautifullTimeFormate(ot?.hour, ot.minutes),
+      });
       return 0;
     } else if (hour > ct?.hour || (hour == ct?.hour && minute > ct?.minutes)) {
       // store is closed for today
-      ErrorToast(
-        toast,
-        'Our delivery services will be open after ' +
+
+      seterrorAlert({
+        visible: true,
+        message:
+          'Our delivery services will be open after ' +
           getBeautifullTimeFormate(ot?.hour, ot.minutes) +
           ', and closes at ' +
           getBeautifullTimeFormate(ct?.hour, ct.minutes),
-      );
+      });
 
       return 0;
     } else {
@@ -272,12 +282,12 @@ export const isStoreOnTime = async (toast, selectedTime) => {
           while (offHours.includes(nextOpeningHour)) {
             nextOpeningHour++;
           }
-
-          ErrorToast(
-            toast,
-            'Our Delivery services will be paused at selected time, will be resume at ' +
+          seterrorAlert({
+            visible: true,
+            message:
+              'Our Delivery services will be paused at selected time, will be resume at ' +
               getBeautifullTimeFormate(nextOpeningHour, 0),
-          );
+          });
 
           return 0;
         }
@@ -320,7 +330,11 @@ export const isStoreOnTime = async (toast, selectedTime) => {
     return currOn;
   } catch (error) {
     console.log(error);
-    ErrorToast(toast, error.message);
+    // ErrorToast(toast, error.message);
+    seterrorAlert({
+      visible: true,
+      message: error.message || error.error || JSON.stringify(error),
+    });
     return -1;
   }
 };

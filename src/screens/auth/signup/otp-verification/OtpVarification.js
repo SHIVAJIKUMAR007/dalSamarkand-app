@@ -33,9 +33,20 @@ export default function OtpVarification({navigation, route}) {
   const [isSubmitting, setisSubmitting] = useState(false);
   const [resendEnable, setresendEnable] = useState(true);
   const toast = useToast();
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
 
   async function resendOtp() {
     console.log('in resend');
+    if (!resendEnable) {
+      setwarnAlert({
+        visible: true,
+        message:
+          'Please wait atleaset of 20 second, your request has been sent. ',
+      });
+      return;
+    }
 
     try {
       ///// api is not working
@@ -51,16 +62,28 @@ export default function OtpVarification({navigation, route}) {
           setresendEnable(true);
         }, 20000);
         // AlertMsg(res.message);
-        SuccessToast(toast, res.message);
+        // SuccessToast(toast, res.message);
+        setsuccessAlert({
+          visible: true,
+          message: res.message,
+        });
         // Alert.alert('Success', res.message);
       } else {
         // AlertMsg(res.message);
-        ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+        // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+        seterrorAlert({
+          visible: true,
+          message: res.message || res.error || JSON.stringify(res),
+        });
         // Alert.alert('Fail', res.message);
       }
     } catch (error) {
       // AlertMsg(error.message);
-      ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+      // ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+      seterrorAlert({
+        visible: true,
+        message: error.message || error.error || JSON.stringify(error),
+      });
 
       console.log(error, 'sdjfk');
     }
@@ -82,49 +105,54 @@ export default function OtpVarification({navigation, route}) {
         form,
         data => {
           console.log(data);
-          SuccessToast(toast, isLogin ? 'Login success' : 'Register success');
-          // Alert.alert(
-          //   isLogin ? 'Login success' : 'Register success',
-          //   data.message,
-          // );
+          // SuccessToast(toast, );
+          setsuccessAlert({
+            visible: true,
+            message: isLogin ? 'Login success' : 'Register success',
+          });
           AsyncStorage.setItem(dalsamarkandJwtToken, data?.token);
           settoken(data?.token);
           setisSubmitting(false);
           setuser({_id: 1});
-          // if (cartId) {
-          //   navigation.popToTop();
-          //   navigation.navigate('Cart');
-          // } else {
-          //   navigation.popToTop();
-          //   navigation.navigate('HomeScreen');
-          // }
           navigation.popToTop();
           navigation.navigate('HomeScreen');
         },
         res => {
-          ErrorToast(
-            toast,
-            isLogin
+          seterrorAlert({
+            visible: true,
+            message: isLogin
               ? 'Login fail, ' + res.message
               : 'Register fail, ' + res.message,
-          );
-
+          });
           // Alert.alert(isLogin ? 'Login fail' : 'Register fail', res.message);
           setisSubmitting(false);
         },
-        null,
+        res => {
+          seterrorAlert({
+            visible: true,
+            message: isLogin
+              ? 'Login fail, ' + res.message
+              : 'Register fail, ' + res.message,
+          });
+          // Alert.alert(isLogin ? 'Login fail' : 'Register fail', res.message);
+          setisSubmitting(false);
+        },
         navigation,
         setuser,
       );
     } catch (error) {
       console.log(error);
-      ErrorToast(toast, error.message);
+      // ErrorToast(toast, error.message);
+      seterrorAlert({
+        visible: true,
+        message: error.message || error.error || JSON.stringify(error),
+      });
       setisSubmitting(false);
     }
 
     setTimeout(() => {
       setisSubmitting(false);
-    }, 5000);
+    }, 7000);
   }
   return (
     <ScrollView>
@@ -157,7 +185,7 @@ export default function OtpVarification({navigation, route}) {
           />
           <View style={styles.row}>
             <Text style={styles.tc}>Didn’t recieved the OTP? </Text>
-            <TouchableOpacity disabled={!resendEnable} onPress={resendOtp}>
+            <TouchableOpacity onPress={resendOtp}>
               <Text style={styles.tc}> RESEND OTP</Text>
             </TouchableOpacity>
           </View>

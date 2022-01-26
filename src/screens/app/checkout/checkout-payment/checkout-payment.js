@@ -26,6 +26,11 @@ export default function CheckoutPayment(props) {
   const toast = useToast();
   const [user, setuser] = useGlobal('user');
   const [cart, setcart] = useGlobal('cart');
+
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
+
   let address_id = props.route?.params?.address_id;
   let dod = props.route?.params?.dod;
   let tod = props.route?.params?.tod;
@@ -65,7 +70,11 @@ export default function CheckoutPayment(props) {
         res => {
           console.log(res);
           // AlertMsg(res?.message);
-          SuccessToast(toast, res.message);
+          // SuccessToast(toast, res.message);
+          setsuccessAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
           setdiscount({
             value: res?.coupon_data?.doc?.value,
             type: res?.coupon_data?.doc?.type,
@@ -81,7 +90,11 @@ export default function CheckoutPayment(props) {
         res => {
           console.log(res?.message);
           // AlertMsg(res?.message);
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
 
           setorderDetail(pre => {
             return {...pre, coupon: null};
@@ -93,7 +106,11 @@ export default function CheckoutPayment(props) {
           setorderDetail(pre => {
             return {...pre, coupon: null};
           });
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
         },
         props.navigation,
         setuser,
@@ -101,7 +118,11 @@ export default function CheckoutPayment(props) {
     } catch (error) {
       console.log(error?.message);
       // AlertMsg(error?.message);
-      ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+      // ErrorToast(toast, error.message || error.error || JSON.stringify(error));
+      seterrorAlert({
+        visible: true,
+        message: error.message || error.error || JSON.stringify(error),
+      });
 
       setorderDetail(pre => {
         return {...pre, coupon: null};
@@ -119,22 +140,24 @@ export default function CheckoutPayment(props) {
     // }
     if (!orderDetail?.payment_type) {
       // Alert.alert('', );
-      ErrorToast(toast, 'Choose a payment method.');
+      // ErrorToast(toast, );
+      seterrorAlert({
+        visible: true,
+        message: 'Choose a payment method.',
+      });
 
       return;
     }
     try {
-      // let dod=new Date()
-      // let tod=new Date()
-      // dod.setHour(tod.getHour())
-      // dod.setHours(tod.getHours());
-      // dod.setMinutes(tod.getMinutes());
-      // console.log(dod);
-      // return;
       setisSubmitting(true);
       axiosPost(
         'order/place_order',
-        {...orderDetail, delivery_date: dod, delivery_hour: tod.getHours()},
+        {
+          ...orderDetail,
+          delivery_date: dod,
+          delivery_hour: tod.getHours(),
+          delivery_minutes: tod.getMinutes(),
+        },
         data => {
           ////////////////// order is placed hence empty the cart //////////////////
           // console.log(data, 'dsjfsdfjksdlfjljk');
@@ -156,7 +179,12 @@ export default function CheckoutPayment(props) {
                 // handle success
 
                 // Alert.alert(`Success`, );
-                SuccessToast(toast, 'Your payment is successfully done.');
+                // SuccessToast(toast, );
+                setsuccessAlert({
+                  visible: true,
+                  message: 'Your payment is successfully done.',
+                });
+
                 setisSubmitting(false);
                 props.navigation.navigate('ThankYou');
               })
@@ -164,15 +192,20 @@ export default function CheckoutPayment(props) {
                 // handle failure
                 error = JSON.parse(error?.description)?.error?.description;
                 // Alert.alert('Error', ` ${error}`);
-                ErrorToast(toast, error);
-
+                // ErrorToast(toast, error);
+                seterrorAlert({
+                  visible: true,
+                  message: error,
+                });
                 setisSubmitting(false);
               });
           }
           ///////////else cash on delivery
           else if (orderDetail?.payment_type == 'cod') {
             // Alert.alert('Success', data?.message);
-            SuccessToast(toast, 'You order is placed.');
+            // SuccessToast(toast, );
+            setsuccessAlert({visible: true, message: 'You order is placed.'});
+
             setisSubmitting(false);
             props.navigation.navigate('ThankYou');
           }
@@ -194,11 +227,11 @@ export default function CheckoutPayment(props) {
                   'paytmMID' + details?.mid,
                 )
                   .then(result => {
-                    // Alert.alert(
-                    //   `Success`,
-                    //   ,
-                    // );
-                    SuccessToast(toast, 'Your payment is successfully done.');
+                    setsuccessAlert({
+                      visible: true,
+                      message: 'Your payment is successfully done.',
+                    });
+
                     console.log(result);
                     setisSubmitting(false);
                     props.navigation.navigate('ThankYou');
@@ -207,7 +240,11 @@ export default function CheckoutPayment(props) {
                     // handleError(err);
                     console.log(err);
                     // Alert.alert(`Fail`, );
-                    ErrorToast(toast, 'Your payment is failed.');
+                    // ErrorToast(toast,);
+                    seterrorAlert({
+                      visible: true,
+                      message: 'Your payment is failed.',
+                    });
 
                     setisSubmitting(false);
                   })
@@ -223,11 +260,11 @@ export default function CheckoutPayment(props) {
                   true,
                 )
                   .then(result => {
-                    // Alert.alert(
-                    //   `Success`,
-                    //   ,
-                    // );
-                    SuccessToast(toast, 'Your payment is successfully done.');
+                    setsuccessAlert({
+                      visible: true,
+                      message: 'Your payment is successfully done.',
+                    });
+
                     console.log(result);
                     setisSubmitting(false);
                     props.navigation.navigate('ThankYou');
@@ -236,28 +273,42 @@ export default function CheckoutPayment(props) {
                     // handleError(err);
                     console.log(err);
                     // Alert.alert(`Fail`, );
-                    ErrorToast(toast, 'Your payment is failed.');
+                    // ErrorToast(toast,);
+                    seterrorAlert({
+                      visible: true,
+                      message: 'Your payment is failed.',
+                    });
 
                     setisSubmitting(false);
                   });
           } else {
             setisSubmitting(false);
             // Alert.alert('Error', );
-            ErrorToast(toast, `Please select a correct payment type`);
+            // ErrorToast(toast, );
+            seterrorAlert({
+              visible: true,
+              message: `Please select a correct payment type`,
+            });
           }
         },
         res => {
           console.log(res);
           // Alert.alert('Fail', JSON.stringify(res));
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
-
+          // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
           setisSubmitting(false);
         },
         res => {
           console.log(res);
           // Alert.alert('Fail', JSON.stringify(res));
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
-
+          // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
           setisSubmitting(false);
         },
         props.navigation,
@@ -266,7 +317,11 @@ export default function CheckoutPayment(props) {
     } catch (error) {
       console.log(error);
       // Alert.alert('Fail', error);
-      ErrorToast(toast, error.message);
+      // ErrorToast(toast, error.message);
+      seterrorAlert({
+        visible: true,
+        message: error.message || error.error || JSON.stringify(error),
+      });
       setisSubmitting(false);
     }
   }

@@ -22,7 +22,6 @@ import {axiosPost} from '../../../axios';
 import {useNavigation} from '@react-navigation/core';
 import {ErrorToast, SuccessToast} from '../../../components/CustmToast';
 import {useToast} from 'react-native-toast-notifications';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function SignIn(props) {
   const [phoneNo, setPhoneNo] = useState('');
@@ -30,12 +29,19 @@ export default function SignIn(props) {
   const [token, settoken] = useGlobal('jwtToken');
   const [isSubmitting, setisSubmitting] = useState(false);
   const toast = useToast();
-
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
   const navigation = useNavigation();
 
   const onSubmit = async () => {
     if (phoneNo?.length != 10) {
-      ErrorToast(toast, 'Mobile number must be of 10 digit.');
+      // ErrorToast(toast, 'Mobile number must be of 10 digit.');
+      seterrorAlert({
+        visible: true,
+        message: 'Mobile number must be of 10 digit.',
+      });
+
       return false;
     }
     setisSubmitting(true);
@@ -48,7 +54,11 @@ export default function SignIn(props) {
         'auth/login',
         loginData,
         async response => {
-          SuccessToast(toast, response.message || JSON.stringify(response));
+          // SuccessToast(toast, response.message || JSON.stringify(response));
+          setsuccessAlert({
+            visible: true,
+            message: response.message || JSON.stringify(response),
+          });
           // Alert.alert('Success', response.message);
           setisSubmitting(false);
           navigation.navigate('OtpSignup', {
@@ -59,23 +69,30 @@ export default function SignIn(props) {
         error => {
           console.log(error.message, '====>58');
           // Alert.alert('Error', error?.message);
-          ErrorToast(toast, error.message);
+          // ErrorToast(toast, error.message);
+          seterrorAlert({
+            visible: true,
+            message: error.message || JSON.stringify(error),
+          });
         },
-        null,
+        error => {
+          console.log(error.message, '====>58');
+          // Alert.alert('Error', error?.message);
+          // ErrorToast(toast, error.message);
+          seterrorAlert({
+            visible: true,
+            message: error.message || JSON.stringify(error),
+          });
+        },
         navigation,
         setuser,
       );
-
-      // let res = await axios.get('https://api.dalsamarkand.com/');
-      // console.log(res.status, res.data);
     } catch (error) {
       setisSubmitting(false);
-      ErrorToast(toast, error.message);
-
-      console.log(error, '====>59');
-      // for (let key in error) {
-      //   console.log(key, error[key]);
-      // }
+      seterrorAlert({
+        visible: true,
+        message: error.message || JSON.stringify(error),
+      });
     }
 
     setTimeout(() => {

@@ -10,12 +10,10 @@ import {
 import CustomHeader from '../../../../components/custom-header';
 import styles from './style';
 import BrownBtn from '../../../../components/brown-btn';
-import {ICONS} from '../../../../constants/icons';
 import {COLORS} from '../../../../constants/colors';
 import {ScrollView} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {IMAGES} from '../../../../constants/images';
 import {useGlobal} from 'reactn';
 import {axiosGet} from '../../../../axios';
 import {FONT_FAMILY} from '../../../../constants/font-family';
@@ -72,7 +70,7 @@ export default function OrderStatus(props) {
             <View style={{flex: 3}}>
               <Text style={styles.otherInfo}>Estimated Delivery</Text>
               <Text style={styles.date}>
-                {moment(orderDetail?.delivery_date?.date).format('dddd', 'LL')}
+                {moment(orderDetail?.delivery_date?.date).format('dddd, LL')}
               </Text>
               <Text style={styles.date}>
                 {getBeautifullTimeFormate(

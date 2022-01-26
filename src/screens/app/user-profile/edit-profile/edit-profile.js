@@ -26,6 +26,10 @@ export default function EditProfile(props) {
   const [editedData, seteditedData] = useState(null);
   const [isEditing, setisEditing] = useState(false);
   const toast = useToast();
+
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
   useEffect(() => {
     seteditedData(user);
     return () => {
@@ -47,11 +51,19 @@ export default function EditProfile(props) {
         console.log(res);
         if (res?.status_code == 1) {
           // AlertMsg(res?.message);
-          SuccessToast(toast, res.message);
+          // SuccessToast(toast, res.message);
+          setsuccessAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
           setuser(editedData);
         } else {
           // AlertMsg(res?.message);
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
         }
         setisEditing(false);
       });

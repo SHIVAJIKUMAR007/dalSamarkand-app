@@ -37,6 +37,10 @@ export default function SignupForm(props) {
   const [isSubmitting, setisSubmitting] = useState(false);
   const [isValidForm, setisValidForm] = useState(false);
   const toast = useToast();
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
+
   function validateFormConti(registerData, toggleCheckBox) {
     let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (
@@ -101,8 +105,12 @@ export default function SignupForm(props) {
         registerData,
         data => {
           console.log(data);
-          // Alert.alert('Success', data.message);
-          SuccessToast(toast, data.message);
+          // Alert.alert('Success',);
+          // SuccessToast(toast, data.message);
+          setsuccessAlert({
+            visible: true,
+            message: data.message,
+          });
           setisSubmitting(false);
           props.navigation.navigate('OtpSignup', {
             mobileNumber: registerData?.phone,
@@ -112,7 +120,11 @@ export default function SignupForm(props) {
         res => {
           // console.log(res, 'status 0');
           // Alert.alert('Error', res?.message);
-          ErrorToast(toast, res.message || res.error || JSON.stringify(res));
+          // ErrorToast(toast, );
+          seterrorAlert({
+            visible: true,
+            message: res.message || res.error || JSON.stringify(res),
+          });
           setisSubmitting(false);
         },
         res => {
@@ -122,7 +134,11 @@ export default function SignupForm(props) {
           for (let key in error) {
             errStr += `${error[key]} is duplicate`;
           }
-          ErrorToast(toast, errStr);
+          // ErrorToast(toast, errStr);
+          seterrorAlert({
+            visible: true,
+            message: errStr,
+          });
           setisSubmitting(false);
 
           // Alert.alert('Error', errStr);
@@ -134,7 +150,11 @@ export default function SignupForm(props) {
       setisSubmitting(false);
       // console.log(error);
       // Alert.alert('Error', error.message);
-      ErrorToast(toast, error.message);
+      // ErrorToast(toast, error.message);
+      seterrorAlert({
+        visible: true,
+        message: error.message || error.error || JSON.stringify(error),
+      });
     }
     setTimeout(() => {
       setisSubmitting(false);

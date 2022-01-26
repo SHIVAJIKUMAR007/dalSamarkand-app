@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
   View,
-  StatusBar,
   ImageBackground,
-  ScrollView,
   Text,
   Image,
   TouchableOpacity,
@@ -38,6 +36,9 @@ export default function Cart(props) {
   const [isLoading, setisLoading] = useState(false);
   const [isUpdatingCart, setisUpdatingCart] = useState(false);
   const toast = useToast();
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
   const getUnauthCart = async () => {
     let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
     // console.log(cartId, 'cartid in cart');
@@ -147,8 +148,10 @@ export default function Cart(props) {
                     checkout: checkout,
                   });
                 else {
-                  // AlertMsg);
-                  infoToast(toast, 'Please login to proceed further.');
+                  setwarnAlert({
+                    visible: true,
+                    message: 'Please login to proceed further.',
+                  });
                   props.navigation.navigate('SignIn');
                 }
               }}

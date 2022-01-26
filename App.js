@@ -9,9 +9,22 @@ import {requestForTrckingPermission} from './src/utils/userTraking';
 import {ToastProvider} from 'react-native-toast-notifications';
 
 import axios from 'axios';
+import {
+  ErrorAlert,
+  SuccessAlert,
+  WarnAlert,
+} from './src/components/alert/Alerts';
+import {useGlobal} from 'reactn';
 
 export default function App() {
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
+  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
+  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
+
   useEffect(() => {
+    seterrorAlert({visible: false, message: ''});
+    setsuccessAlert({visible: false, message: ''});
+    setwarnAlert({visible: false, message: ''});
     let isMount = true;
 
     async function starter() {
@@ -47,6 +60,9 @@ export default function App() {
       <ToastProvider>
         <AppNavigator />
       </ToastProvider>
+      <SuccessAlert />
+      <ErrorAlert />
+      <WarnAlert />
     </React.Fragment>
   );
 }
