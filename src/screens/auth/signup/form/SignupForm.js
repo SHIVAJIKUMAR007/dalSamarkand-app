@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Dimensions,
 } from 'react-native';
 import InputBox from '../../../../components/input-box';
 import styles from './style';
@@ -23,6 +24,7 @@ import {axiosPost} from '../../../../axios';
 import {CheckBox} from 'react-native-elements';
 import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
 import {useToast} from 'react-native-toast-notifications';
+const {width, height} = Dimensions.get('window');
 
 export default function SignupForm(props) {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
@@ -189,7 +191,7 @@ export default function SignupForm(props) {
     // }
   };
   return (
-    <ScrollView>
+    <ScrollView style={{minHeight: height}}>
       <View
         colors={[COLORS.PRIMARY, COLORS.SECONDARY]}
         style={styles.container}>

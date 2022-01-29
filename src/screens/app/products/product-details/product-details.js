@@ -129,6 +129,9 @@ export default function ProductDetails(props) {
                 Dal Samarkand. A unit of Neetu Ujval Ahuja
               </Text>
               <Text style={styles.productName}>{product?.title}</Text>
+              <Text style={[styles.productInfo, {marginTop: 10}]}>
+                {product?.long_desc}
+              </Text>
               <Text style={styles.productPrice}>Rs. {product?.sale_price}</Text>
               {product?.mrp > product?.sale_price ? (
                 <Text style={styles.productMrp}>Rs. {product?.mrp}</Text>

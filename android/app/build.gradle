@@ -129,8 +129,8 @@ android {
         applicationId "com.dalsamarkand"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1007   
-        versionName "1.0.2"
+        versionCode 1007005
+        versionName "1.0.3"
     }
     splits {
         abi {
@@ -202,6 +202,9 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:4.2.1"
     implementation "com.squareup.okhttp3:okhttp-urlconnection:4.2.1"
     ///////// paytm all in one sdk //////////////////////
+
+    ///////////   uxcam ////////////////////////////
+    compile project(':react-native-ux-cam')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'

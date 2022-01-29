@@ -113,7 +113,7 @@ export default function Cart(props) {
             data={checkout?.items}
             renderItem={item => (
               <CartItem
-                key={item?.index}
+                key={item?.item?._id}
                 data={item?.item}
                 navigation={props.navigation}
                 setisCartLoading={setisUpdatingCart}

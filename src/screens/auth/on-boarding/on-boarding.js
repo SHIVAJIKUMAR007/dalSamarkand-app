@@ -112,7 +112,11 @@ function RenderItem(props) {
       <View style={styles.topContainer}>
         <TouchableOpacity
           style={styles.skipContainer}
-          onPress={() => {
+          onPress={async () => {
+            await AsyncStorage.setItem(
+              firstTimeThreeScreen,
+              'seen one time before',
+            );
             props.navigation.navigate('HomeScreen');
           }}>
           <Text style={styles.skip}>

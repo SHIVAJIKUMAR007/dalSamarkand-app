@@ -7,8 +7,7 @@ import {
   StatusBar,
   ImageBackground,
   ScrollView,
-  BackHandler,
-  Alert,
+  Dimensions,
 } from 'react-native';
 import InputBox from '../../../components/input-box';
 import styles from './style';
@@ -20,9 +19,9 @@ import ShadowBtn from '../../../components/shadow-btn';
 import {useGlobal} from 'reactn';
 import {axiosPost} from '../../../axios';
 import {useNavigation} from '@react-navigation/core';
-import {ErrorToast, SuccessToast} from '../../../components/CustmToast';
 import {useToast} from 'react-native-toast-notifications';
 
+const {width, height} = Dimensions.get('window');
 export default function SignIn(props) {
   const [phoneNo, setPhoneNo] = useState('');
   const [user, setuser] = useGlobal('user');
@@ -94,14 +93,10 @@ export default function SignIn(props) {
         message: error.message || JSON.stringify(error),
       });
     }
-
-    setTimeout(() => {
-      setisSubmitting(false);
-    }, 3000);
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={{minHeight: height}}>
       <View
         colors={[COLORS.PRIMARY, COLORS.SECONDARY]}
         style={styles.container}>
@@ -153,7 +148,7 @@ export default function SignIn(props) {
           </Text>
           <ShadowBtn
             marginVertical={10}
-            disabled={phoneNo.length < 10 ? true : false}
+            // disabled={phoneNo.length < 10 ? true : false}
             isLoading={isSubmitting}
             title="Proceed via OTP"
             onPress={() => onSubmit()}

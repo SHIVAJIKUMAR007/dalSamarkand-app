@@ -8,7 +8,8 @@ export default function BrownBtn(props) {
   return (
     <View
       style={{
-        marginVertical: props.marginVertical,
+        marginVertical: props.marginVertical ? props.marginVertical : 15,
+        marginHorizontal: 20,
         zIndex: 0,
         paddingHorizontal: 20,
       }}>

@@ -8,4 +8,6 @@ project(':react-native-razorpay').projectDir = new File(rootProject.projectDir, 
 //spalash screen 
 include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
-
+//uxcam
+include ':react-native-ux-cam'
+project(':react-native-ux-cam').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-ux-cam/android')

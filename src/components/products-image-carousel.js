@@ -2,7 +2,6 @@ import React, {useRef} from 'react';
 import Carousel from 'react-native-snap-carousel';
 import {View, Dimensions, StyleSheet, Image, Text} from 'react-native';
 import {COLORS} from '../constants/colors';
-import {IMAGES} from '../constants/images';
 import {serverEndPoint} from '../config';
 
 const {width} = Dimensions.get('window');
@@ -10,6 +9,7 @@ const {width} = Dimensions.get('window');
 export default function ProductsImageCarousel(props) {
   const carouselRef = useRef(null);
   const banner = props.banner;
+  // console.log(banner);
 
   return (
     <Carousel
@@ -28,13 +28,17 @@ export default function ProductsImageCarousel(props) {
 }
 
 const RenderItem = ({item, banner}) => {
+  // console.log(
+  //   item,
+  //   serverEndPoint + 'uploads/images/products/' + item?.item?.name,
+  // );
   return (
     <>
       <View style={styles.item} key={item.id}>
         {/* ?IMAGES.PRODUCTS */}
         <Image
           source={{
-            uri: serverEndPoint + 'uploads/images/products/' + item?.name,
+            uri: serverEndPoint + 'uploads/images/products/' + item?.item?.name,
           }}
           style={styles.image}
         />

@@ -110,7 +110,7 @@ export default function OrdersList(props) {
           </View>
           <View style={{padding: 25}}>
             <BrownBtn
-              title="Start odering"
+              title="Start Ordering"
               onPress={() => props.navigation.navigate('HomeScreen')}
             />
           </View>

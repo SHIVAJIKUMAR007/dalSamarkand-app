@@ -11,19 +11,25 @@ const StoreStateMsg = () => {
 
   return (
     <View>
-      <Text
-        style={{
-          color:
-            !settings?.todayOn || !settings.currOn ? COLORS.RED : COLORS.GREEN,
-          marginVertical: 15,
-          textAlign: 'center',
-        }}>
-        {settings?.todayOn
-          ? settings?.currOn
-            ? settings?.onMessage
-            : settings?.offMessage
-          : settings?.todayOffMessage}
-      </Text>
+      {settings?.onMessage ||
+      settings?.offMessage ||
+      settings?.todayOffMessage ? (
+        <Text
+          style={{
+            color:
+              !settings?.todayOn || !settings.currOn
+                ? COLORS.RED
+                : COLORS.GREEN,
+            marginVertical: 15,
+            textAlign: 'center',
+          }}>
+          {settings?.todayOn
+            ? settings?.currOn
+              ? settings?.onMessage
+              : settings?.offMessage
+            : settings?.todayOffMessage}
+        </Text>
+      ) : null}
     </View>
   );
 };

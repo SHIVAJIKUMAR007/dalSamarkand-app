@@ -86,7 +86,7 @@ export default function CheckoutDelivery(props) {
     let time_format = moment(currTime).format('LT');
     setTime(currTime);
     let result = await isStoreOnTime(toast, currTime, seterrorAlert);
-    console.log(time_format, currTime, result);
+    // console.log(time_format, currTime, result);
     if ((Platform.OS == 'ios' || event.type == 'set') && result == 1) {
       setTod(time_format);
       setrightDateTime(pre => {
@@ -168,6 +168,7 @@ export default function CheckoutDelivery(props) {
               setsuccessAlert({
                 visible: true,
                 message:
+                  deleteMsg?.mgs ||
                   deleteMsg.message ||
                   deleteMsg.error ||
                   JSON.stringify(deleteMsg),
@@ -217,29 +218,29 @@ export default function CheckoutDelivery(props) {
           {/* one of addresses  */}
           {allAddress?.map((address, i) => (
             <View style={styles.card} key={i}>
-              <View style={styles.selectAddressView}>
-                <TouchableOpacity
-                  onPress={() => {
-                    selectedAddress == i
-                      ? setselectedAddress(null)
-                      : setselectedAddress(i);
-                  }}>
+              <TouchableOpacity
+                onPress={() => {
+                  selectedAddress == i
+                    ? setselectedAddress(null)
+                    : setselectedAddress(i);
+                }}>
+                <View style={styles.selectAddressView}>
                   <View style={styles.circle}>
                     {selectedAddress == i && (
                       <View style={styles.activeCircle} />
                     )}
                   </View>
-                </TouchableOpacity>
-                <View style={{width: '75%'}}>
-                  <Text style={styles.name}>{address?.name}</Text>
-                  <View style={styles.divider} />
-                  <Text style={styles.otherInfo}>
-                    {`${address?.address}, ${address?.landmark}, ${address?.city?.name}, - ${address?.pin_code?.code}`}
-                  </Text>
-                  <View style={styles.divider} />
-                  <Text style={styles.otherInfo}>+91 {address?.phone}</Text>
+                  <View style={{width: '75%'}}>
+                    <Text style={styles.name}>{address?.name}</Text>
+                    <View style={styles.divider} />
+                    <Text style={styles.otherInfo}>
+                      {`${address?.address}, ${address?.landmark}, ${address?.city?.name}, - ${address?.pin_code?.code}`}
+                    </Text>
+                    <View style={styles.divider} />
+                    <Text style={styles.otherInfo}>+91 {address?.phone}</Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
 
               <View style={styles.editAndDelete}>
                 <TouchableOpacity
@@ -404,17 +405,9 @@ const AddressModal = ({
       name: address?.name ? address?.name : null,
       phone: address?.phone ? address?.phone : null,
     });
-    return () => {
-      setaddressData({
-        address: null,
-        city: null,
-        state: null,
-        pin_code: null,
-        landmark: null,
-        name: null,
-        phone: null,
-      });
-    };
+  }, [address?._id]);
+  useEffect(() => {
+    if (address?._id) setisFormValid(true);
   }, [address?._id]);
   function validform(addressData) {
     if (!addressData?.name) {
@@ -548,12 +541,12 @@ const AddressModal = ({
     }
   }
   function getallPin(city_id) {
-    console.log(city_id, 'hkjhkjjjhh');
+    // console.log(city_id, 'hkjhkjjjhh');
     if (city_id)
       axiosGet(
         'cityandpin/' + city_id,
         res => {
-          console.log(res);
+          // console.log(res);
           res = res.map(r => {
             return {label: r?.code, value: r?._id};
           });
@@ -601,10 +594,11 @@ const AddressModal = ({
                 value={addressData?.name}
                 onChangeText={val => {
                   setaddressData(pre => {
-                    return {...pre, name: val};
+                    pre = {...pre, name: val};
+                    setisFormValid(validform(pre));
+                    return pre;
                   });
                 }}
-                onBlur={() => setisFormValid(validform(addressData))}
                 placeholder="Name"
               />
 
@@ -612,20 +606,22 @@ const AddressModal = ({
                 value={addressData?.address}
                 onChangeText={val => {
                   setaddressData(pre => {
-                    return {...pre, address: val};
+                    pre = {...pre, address: val};
+                    setisFormValid(validform(pre));
+                    return pre;
                   });
                 }}
-                onBlur={() => setisFormValid(validform(addressData))}
                 placeholder="Address"
               />
               <GreyInputBox
                 value={addressData?.landmark}
                 onChangeText={val => {
                   setaddressData(pre => {
-                    return {...pre, landmark: val};
+                    pre = {...pre, landmark: val};
+                    setisFormValid(validform(pre));
+                    return pre;
                   });
                 }}
-                onBlur={() => setisFormValid(validform(addressData))}
                 placeholder="Landmark"
               />
               <PickerCompo

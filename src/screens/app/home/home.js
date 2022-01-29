@@ -182,7 +182,7 @@ export default function HomeScreen(props) {
         <View style={{alignItems: 'center'}}>
           <Image source={ICONS.TRUCK} style={{height: 35, width: 35}} />
           <Text style={styles.charges}>
-            ₹72 DELIVERY CHARGES . ORDERS TO BE PLACED 24 HRS PRIOR
+            ₹72 DELIVERY CHARGES . ORDERS TO BE PLACED 2 HRS PRIOR
           </Text>
         </View>
 
@@ -207,7 +207,7 @@ export default function HomeScreen(props) {
         </View>
       </ImageBackground>
 
-      <ImageBackground
+      {/* <ImageBackground
         source={IMAGES.DARK_BG1}
         resizeMethod="auto"
         style={styles.infoBg}>
@@ -226,7 +226,7 @@ export default function HomeScreen(props) {
           source={ICONS.DOTS}
           style={{height: 7, width: 90, marginTop: 10}}
         />
-      </ImageBackground>
+      </ImageBackground> */}
 
       <ImageBackground
         source={IMAGES.HOME_BG4}

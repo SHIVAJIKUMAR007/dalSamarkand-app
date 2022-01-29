@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import CustomHeader from '../../../../components/custom-header';
 import styles from './style';
@@ -23,6 +24,7 @@ import AlertMsg from '../../../../components/alert-msg';
 import {useToast} from 'react-native-toast-notifications';
 import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
 import {requestUserPermission} from '../../../../utils/notificationService';
+const {width, height} = Dimensions.get('window');
 
 export default function OtpVarification({navigation, route}) {
   let mobileNumber = route?.params?.mobileNumber;
@@ -149,13 +151,9 @@ export default function OtpVarification({navigation, route}) {
       });
       setisSubmitting(false);
     }
-
-    setTimeout(() => {
-      setisSubmitting(false);
-    }, 7000);
   }
   return (
-    <ScrollView>
+    <ScrollView style={{minHeight: height}}>
       <View style={styles.container}>
         <StatusBar
           translucent={true}
@@ -185,7 +183,7 @@ export default function OtpVarification({navigation, route}) {
           />
           <View style={styles.row}>
             <Text style={styles.tc}>Didn’t recieved the OTP? </Text>
-            <TouchableOpacity onPress={resendOtp}>
+            <TouchableOpacity disabled={isSubmitting} onPress={resendOtp}>
               <Text style={styles.tc}> RESEND OTP</Text>
             </TouchableOpacity>
           </View>

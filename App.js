@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useLayoutEffect} from 'react';
 import {StatusBar} from 'react-native';
 import AppNavigator from './src/navigations/app-navigator';
 import {
@@ -20,11 +20,13 @@ export default function App() {
   const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   const [successAlert, setsuccessAlert] = useGlobal('successAlert');
   const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     seterrorAlert({visible: false, message: ''});
     setsuccessAlert({visible: false, message: ''});
     setwarnAlert({visible: false, message: ''});
+  }, []);
+
+  useEffect(() => {
     let isMount = true;
 
     async function starter() {

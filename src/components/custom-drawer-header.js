@@ -30,10 +30,13 @@ export default function CustomDrawerHeader(props) {
             source={props.isLight ? ICONS.CART_LIGHT : ICONS.CART_DARK}
             style={styles.cart}
           />
-
-          <View style={styles.qtyContainer}>
-            <Text style={styles.qty}>{cart?.length ? cart?.length : 0}</Text>
-          </View>
+          {cart?.length ? (
+            <View style={styles.qtyContainer}>
+              <Text style={styles.qty}>
+                {cart?.length ? cart?.length : null}
+              </Text>
+            </View>
+          ) : null}
         </View>
       </TouchableOpacity>
     </View>
