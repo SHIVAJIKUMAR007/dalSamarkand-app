@@ -73,6 +73,7 @@ export default function SignIn(props) {
             visible: true,
             message: error.message || JSON.stringify(error),
           });
+          setisSubmitting(false);
         },
         error => {
           console.log(error.message, '====>58');
@@ -82,6 +83,7 @@ export default function SignIn(props) {
             visible: true,
             message: error.message || JSON.stringify(error),
           });
+          setisSubmitting(false);
         },
         navigation,
         setuser,
@@ -148,7 +150,7 @@ export default function SignIn(props) {
           </Text>
           <ShadowBtn
             marginVertical={10}
-            // disabled={phoneNo.length < 10 ? true : false}
+            disabled={phoneNo.length < 10 ? true : false}
             isLoading={isSubmitting}
             title="Proceed via OTP"
             onPress={() => onSubmit()}

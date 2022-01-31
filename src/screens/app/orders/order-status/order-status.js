@@ -28,12 +28,13 @@ export default function OrderStatus(props) {
   let orderId = props?.route?.params?.orderId;
   const [orderDetail, setorderDetail] = useState({});
   const [user, setuser] = useGlobal('user');
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   useEffect(() => {
     axiosGet(
       'order/' + orderId,
       data => {
-        // console.log(data);
-        setorderDetail(data);
+        // console.log(data[0]?.cart, 'jdsjkfasdfddnfsdnfjj');
+        setorderDetail(data[0]);
       },
       res => console.log(res),
       props.navigation,

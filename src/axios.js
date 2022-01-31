@@ -48,7 +48,7 @@ async function axiosPost(
   navigation,
   setuser,
 ) {
-  // console.log(serverEndPoint + url);
+  console.log(serverEndPoint + url);
   AsyncStorage.getItem(dalsamarkandJwtToken).then(token => {
     let isForm = form instanceof FormData;
     instance

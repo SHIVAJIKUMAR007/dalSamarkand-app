@@ -31,6 +31,7 @@ export default function ProductDetails(props) {
   const [fetchingProduct, setfetchingProduct] = useState(false);
   const [isPresentInCart, setisPresentInCart] = useState(false);
   const [reloadPage, setreloadPage] = useState(false);
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   useEffect(() => {
     // reload on every focus
     const reload = props.navigation.addListener('focus', () => {

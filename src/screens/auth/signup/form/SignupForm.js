@@ -120,7 +120,7 @@ export default function SignupForm(props) {
           });
         },
         res => {
-          // console.log(res, 'status 0');
+          console.log(res, 'status 0');
           // Alert.alert('Error', res?.message);
           // ErrorToast(toast, );
           seterrorAlert({
@@ -150,7 +150,7 @@ export default function SignupForm(props) {
       );
     } catch (error) {
       setisSubmitting(false);
-      // console.log(error);
+      console.log(error);
       // Alert.alert('Error', error.message);
       // ErrorToast(toast, error.message);
       seterrorAlert({

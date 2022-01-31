@@ -32,6 +32,7 @@ export default function OrdersList(props) {
   const [isLoading, setisLoading] = useState(false);
   const [isRefreshing, setisRefreshing] = useState(false);
   const [user, setuser] = useGlobal('user');
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   const getOrders = () => {
     setisLoading(true);
     axiosGet(

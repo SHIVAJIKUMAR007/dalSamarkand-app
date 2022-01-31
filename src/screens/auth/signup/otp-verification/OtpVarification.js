@@ -105,14 +105,14 @@ export default function OtpVarification({navigation, route}) {
       axiosPost(
         'auth/verify_otp',
         form,
-        data => {
+        async data => {
+          await AsyncStorage.setItem(dalsamarkandJwtToken, data?.token);
           console.log(data);
           // SuccessToast(toast, );
           setsuccessAlert({
             visible: true,
             message: isLogin ? 'Login success' : 'Register success',
           });
-          AsyncStorage.setItem(dalsamarkandJwtToken, data?.token);
           settoken(data?.token);
           setisSubmitting(false);
           setuser({_id: 1});

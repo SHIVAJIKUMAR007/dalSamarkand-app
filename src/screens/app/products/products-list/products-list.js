@@ -32,6 +32,7 @@ export default function ProductList(props) {
   const [user, setuser] = useGlobal('user');
   const navigation = useNavigation();
   const [fetchingProduct, setfetchingProduct] = useState(false);
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
 
   useEffect(() => {
     const reload = navigation.addListener('focus', () => {

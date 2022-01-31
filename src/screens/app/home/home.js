@@ -33,7 +33,7 @@ export default function HomeScreen(props) {
   const [user, setuser] = useGlobal('user');
   const navigation = useNavigation();
   const [cart, setcart] = useGlobal('cart');
-
+  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   ///////////////////// check for user is exist or not and get a cart ///////////////////////////////////////////////
   const checkAuthData = async () => {
     const tempAuth = await AsyncStorage.getItem(dalsamarkandJwtToken);
@@ -43,11 +43,12 @@ export default function HomeScreen(props) {
         axiosGet(
           'profile',
           async userData => {
-            // console.log(userData, '===========>38 home.js');
+            console.log(userData, '===========>38 home.js');
             setuser(userData);
             axiosGet(
               'cart',
               data => {
+                console.log(data);
                 setcart(data?.items);
               },
               res => console.log(res),

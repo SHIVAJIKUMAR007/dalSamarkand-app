@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, StatusBar, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import CustomHeader from '../../../../components/custom-header';
@@ -7,9 +7,27 @@ import styles from './style';
 import Feather from 'react-native-vector-icons/Feather';
 import BrownBtn from '../../../../components/brown-btn';
 import {useGlobal} from 'reactn';
+import {axiosGet} from '../../../../axios';
+import AsyncStorage from '@react-native-community/async-storage';
+import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
 
 export default function ViewProfile(props) {
   const [user, setuser] = useGlobal('user');
+  useEffect(() => {
+    axiosGet(
+      'profile',
+      async userData => {
+        // console.log(userData, '===========>38 home.js');
+        setuser(userData);
+      },
+      res => {
+        AsyncStorage.removeItem(dalsamarkandJwtToken);
+        setuser(null);
+      },
+      null,
+      setuser,
+    );
+  }, []);
   return (
     <View style={styles.container}>
       <StatusBar
