@@ -8,6 +8,7 @@ import {
   FlatList,
   SafeAreaView,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import CustomHeader from '../../../components/custom-header';
 import styles from './style';
@@ -35,7 +36,7 @@ const Notification = props => {
         data => {
           setnotifications(data);
           setisLoading(false);
-          console.log(data);
+          // console.log(data);
         },
         res => {
           seterrorAlert({
@@ -120,6 +121,7 @@ const Notification = props => {
 export default Notification;
 
 const NotificationDetails = ({getnotification, notification}) => {
+  // console.log(notification);
   const [textShown, setTextShown] = useState(false); //To show ur remaining Text
   const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
   const toggleNumberOfLines = () => {
@@ -144,14 +146,18 @@ const NotificationDetails = ({getnotification, notification}) => {
           backgroundColor: '#ffffff',
         }}>
         <Text style={{fontWeight: '700', marginLeft: 4}}>
-          {notification?.title}
+          {notification?.title
+            ? notification?.title
+            : notification?.notification?.title}
         </Text>
         {/* <Text numberOfLines={2}>{notification.body}</Text> */}
         <Text
           onTextLayout={onTextLayout}
           numberOfLines={textShown ? undefined : 2}
           style={{lineHeight: 21}}>
-          {notification?.body}
+          {notification?.body
+            ? notification?.body
+            : notification?.notification?.body}
         </Text>
 
         {lengthMore ? (

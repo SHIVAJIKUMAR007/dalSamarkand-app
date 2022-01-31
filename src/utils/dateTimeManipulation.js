@@ -1,4 +1,8 @@
-export const timeToAgo = ms => {
+export const timeToAgo = date => {
+  let ms = new Date(date);
+  ms = ms.getTime();
+  // console.log(ms);
+
   const periods = {
     year: 12 * 30 * 24 * 60 * 60 * 1000,
     month: 30 * 24 * 60 * 60 * 1000,
