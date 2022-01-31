@@ -164,8 +164,12 @@ async function axiosGet(url, cb_success, cb_error, navigation, setuser) {
       })
 
       .catch(err => {
-        console.log(err?.response);
-        if (err?.response?.status == 422 || err?.response?.status == 401) {
+        // console.log(err?.response);
+        if (err?.response?.status == 422) {
+          console.log(err?.response?.data?.errors, 'err ');
+          if (cb_form_validator) cb_form_validator(err);
+          else form_validation_handler(err);
+        } else if (err?.response?.status == 401) {
           console.log('invalide user login first ');
           invalid_user_handler(navigation, setuser);
         } else {

@@ -57,8 +57,12 @@ export default function HomeScreen(props) {
             );
           },
           res => {
-            AsyncStorage.removeItem(dalsamarkandJwtToken);
-            setuser(null);
+            // AsyncStorage.removeItem(dalsamarkandJwtToken);
+            // setuser(null);
+            seterrorAlert({
+              visible: true,
+              message: res.message || res.error || JSON.stringify(res),
+            });
           },
           null,
           setuser,
@@ -74,7 +78,13 @@ export default function HomeScreen(props) {
           data => {
             setcart(data?.items);
           },
-          res => console.log(res),
+          res => {
+            console.log(res);
+            seterrorAlert({
+              visible: true,
+              message: res.message || res.error || JSON.stringify(res),
+            });
+          },
           null,
           setuser,
         );
