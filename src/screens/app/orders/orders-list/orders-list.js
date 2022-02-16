@@ -187,9 +187,9 @@ function OneOrder({item, navigation}) {
               fontFamily: FONT_FAMILY.baskervilleOldFace,
               marginTop: 18,
             }}>
-            Preparing To Pack 2 items
+            Ordered {item?.cart?.length} items
           </Text>
-          <Text
+          {/* <Text
             style={{
               fontSize: 14,
               color: 'rgba(0,0,0,0.5)',
@@ -197,9 +197,10 @@ function OneOrder({item, navigation}) {
               fontFamily: FONT_FAMILY.baskervilleOldFace,
               marginVertical: 8,
             }}>
+            {item?.order_status?._id == dalOrderRecivedStatus?"Your "+item?.order_status?.title}
             We will process your order witthin 12-24 hours. Once processed we
             will update the Estimated Delivery Date and Time.
-          </Text>
+          </Text> */}
           {/* <RatingSystem order={item} /> */}
           <StepedTrack status={item?.order_status} />
         </View>

@@ -98,7 +98,7 @@ export default function SignIn(props) {
   };
 
   return (
-    <ScrollView style={{minHeight: height}}>
+    <ScrollView>
       <View
         colors={[COLORS.PRIMARY, COLORS.SECONDARY]}
         style={styles.container}>

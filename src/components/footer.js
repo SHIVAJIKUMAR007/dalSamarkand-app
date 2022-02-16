@@ -7,6 +7,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import {COLORS} from '../constants/colors';
 import {IMAGES} from '../constants/images';
@@ -18,6 +19,7 @@ const {width} = Dimensions.get('window');
 
 export default function Footer(props) {
   const navigation = useNavigation();
+  let date = new Date();
   return (
     <View style={styles.container}>
       <View style={styles.tabsConatiner}>
@@ -27,9 +29,9 @@ export default function Footer(props) {
 
         <View style={{flex: 1, alignItems: 'center'}}>
           <View>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <Text style={styles.links}>SEARCH</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               onPress={() => navigation.navigate('PrivacyPolicy')}>
               <Text style={styles.links}>PRIVACY POLICY</Text>
@@ -48,12 +50,29 @@ export default function Footer(props) {
             </TouchableOpacity>
           </View>
 
+          {/* social links  */}
           <View style={styles.socialIcon}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  Linking.openURL(
+                    'https://www.facebook.com/dalsamarkandstore/',
+                  );
+                } catch (error) {
+                  console.log(error);
+                }
+              }}>
               <Feather name="facebook" color={COLORS.WHITE} size={23} />
             </TouchableOpacity>
             <View style={{width: 20}} />
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  Linking.openURL('https://www.instagram.com/dalsamarkand/');
+                } catch (error) {
+                  console.log(error);
+                }
+              }}>
               <Feather name="instagram" color={COLORS.WHITE} size={23} />
             </TouchableOpacity>
           </View>
@@ -65,8 +84,11 @@ export default function Footer(props) {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* copyright  */}
       <Text style={styles.copyright}>
-        Copyright © 2021, Dal Samarkand. A unit of Neetu Ujval Ahuja.
+        Copyright © {date.getFullYear()}, Dal Samarkand. A unit of Neetu Ujval
+        Ahuja.
       </Text>
     </View>
   );

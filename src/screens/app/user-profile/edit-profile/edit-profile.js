@@ -1,35 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  StatusBar,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import {View, StatusBar, Image, ScrollView} from 'react-native';
 import CustomHeader from '../../../../components/custom-header';
-import {COLORS} from '../../../../constants/colors';
 import styles from './style';
-import Feather from 'react-native-vector-icons/Feather';
 import BrownBtn from '../../../../components/brown-btn';
 import GreyInputBox from '../../../../components/grey-input-box';
 // import ImagePicker from 'react-native-image-crop-picker';
 import {useGlobal} from 'reactn';
 import instance from '../../../../axios';
 import AsyncStorage from '@react-native-community/async-storage';
-import AlertMsg from '../../../../components/alert-msg';
 import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
-import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
-import {useToast} from 'react-native-toast-notifications';
+// import {useToast} from 'react-native-toast-notifications';
 
 export default function EditProfile(props) {
   const [user, setuser] = useGlobal('user');
   const [editedData, seteditedData] = useState(null);
   const [isEditing, setisEditing] = useState(false);
-  const toast = useToast();
+  // const toast = useToast();
 
   const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   const [successAlert, setsuccessAlert] = useGlobal('successAlert');
-  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
   useEffect(() => {
     seteditedData(user);
     return () => {
@@ -38,6 +27,16 @@ export default function EditProfile(props) {
   }, [user?._id]);
 
   const updateProfile = () => {
+    // if(editedData?.email)
+    let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!editedData?.email?.match(validEmailType) || !editedData?.name) {
+      console.log(editedData, 'djfkjskdfkjk');
+      seterrorAlert({
+        visible: true,
+        message: 'Please fill all your details correctly.',
+      });
+      return;
+    }
     setisEditing(true);
     try {
       AsyncStorage.getItem(dalsamarkandJwtToken).then(async token => {
@@ -50,16 +49,12 @@ export default function EditProfile(props) {
         res = res.data;
         console.log(res);
         if (res?.status_code == 1) {
-          // AlertMsg(res?.message);
-          // SuccessToast(toast, res.message);
           setsuccessAlert({
             visible: true,
             message: res.message || res.error || JSON.stringify(res),
           });
           setuser(editedData);
         } else {
-          // AlertMsg(res?.message);
-          // ErrorToast(toast, res.message || res.error || JSON.stringify(res));
           seterrorAlert({
             visible: true,
             message: res.message || res.error || JSON.stringify(res),
@@ -115,11 +110,6 @@ export default function EditProfile(props) {
           />
           <GreyInputBox
             value={editedData?.phone?.toString()}
-            // onChangeText={val =>
-            //   seteditedData(pre => {
-            //     return {...pre, phone: val};
-            //   })
-            // }
             editable={false}
             placeholder="Phone Number"
             keyboardType="numeric"
@@ -140,7 +130,11 @@ export default function EditProfile(props) {
         </View>
       </View>
       <View style={{padding: 25}}>
-        <BrownBtn title="Update" disabled={isEditing} onPress={updateProfile} />
+        <BrownBtn
+          title="Update"
+          isLoading={isEditing}
+          onPress={updateProfile}
+        />
       </View>
     </ScrollView>
   );

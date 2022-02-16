@@ -191,7 +191,8 @@ const OneProduct = props => {
             })
           }>
           <Text style={styles.productName}>
-            {data?.title} (Order Lead Time- 24 Hours)
+            {data?.title}
+            {/* (Order Lead Time- 24 Hours) */}
           </Text>
         </TouchableOpacity>
 

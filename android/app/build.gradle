@@ -129,8 +129,8 @@ android {
         applicationId "com.dalsamarkand"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1007005
-        versionName "1.0.3"
+        versionCode 1007006
+        versionName "1.0.4"
     }
     splits {
         abi {

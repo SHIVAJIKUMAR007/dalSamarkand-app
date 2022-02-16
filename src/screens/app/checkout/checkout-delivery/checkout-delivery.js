@@ -21,8 +21,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {dalsamarkandJwtToken} from '../../../../constants/appConstant';
 import {useToast} from 'react-native-toast-notifications';
 import {isHoliday, isStoreOnTime} from '../../../../utils/settings';
-import {ErrorToast, SuccessToast} from '../../../../components/CustmToast';
 import PickerCompo from '../../../../components/PickerCompo';
+import {FONT_FAMILY} from '../../../../constants/font-family';
 
 export default function CheckoutDelivery(props) {
   const [dod, setDod] = useState(moment().format('dddd, LL'));
@@ -43,7 +43,6 @@ export default function CheckoutDelivery(props) {
   const toast = useToast();
   const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   const [successAlert, setsuccessAlert] = useGlobal('successAlert');
-  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
 
   const onChange = async (event, selectedDate) => {
     let currentDate = selectedDate || date;
@@ -345,16 +344,6 @@ export default function CheckoutDelivery(props) {
             !rightDateTime.time
           }
           onPress={() => {
-            // if (
-
-            // ) {
-            //   console.log(
-            //     selectedAddress,
-            //     !rightDateTime.date,
-            //     !rightDateTime.time,
-            //   );
-            //   return;
-            // }
             props.navigation.navigate('CheckoutPayment', {
               address_id: allAddress[selectedAddress]?._id,
               checkout: checkout,
@@ -383,7 +372,6 @@ const AddressModal = ({
 
   const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   const [successAlert, setsuccessAlert] = useGlobal('successAlert');
-  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
 
   const [addressData, setaddressData] = useState({
     address: null,
@@ -395,73 +383,73 @@ const AddressModal = ({
   });
   const [allPin, setallPin] = useState([]);
   const [isFormValid, setisFormValid] = useState(false);
+  const [isPinAvail, setisPinAvail] = useState(true);
   // console.log(address);
   useEffect(() => {
     setaddressData({
       address: address?.address ? address?.address : null,
       city: address?.city?._id ? address?.city?._id : null,
-      pin_code: address?.pin_code?._id ? address?.pin_code?._id : null,
+      pin_code: address?.pin_code?._id ? address?.pin_code?.code : null,
       landmark: address?.landmark ? address?.landmark : null,
       name: address?.name ? address?.name : null,
       phone: address?.phone ? address?.phone : null,
     });
+    getallPin(address?.city?._id);
   }, [address?._id]);
   useEffect(() => {
     if (address?._id) setisFormValid(true);
   }, [address?._id]);
   function validform(addressData) {
-    if (!addressData?.name) {
-      // Alert.alert('Please check');
-      // ErrorToast(toast, 'Name field is required.');
-
+    // console.log(addressData?.pin_code, addressData?.pin_code?.length);
+    if (
+      !addressData?.name ||
+      !addressData?.address ||
+      !addressData?.landmark ||
+      !addressData?.city
+    ) {
       return false;
     }
-    if (!addressData?.address) {
-      // Alert.alert('Please check');
-      // ErrorToast(toast, 'Address field is required.');
-
+    if (addressData?.pin_code?.length != 6) {
+      setisPinAvail(true);
       return false;
     }
-    if (!addressData?.landmark) {
-      // Alert.alert('Please check');
-      // ErrorToast(toast, 'Landmark field is required.');
-
+    if (addressData?.pin_code?.length == 6) {
+      //if pincode is 6 digit then explore if pin code is availabe for delivery or not
+      let flag = false;
+      for (let i = 0; i < allPin.length; i++) {
+        const el = allPin[i];
+        if (parseInt(addressData?.pin_code) == el?.label) {
+          flag = true;
+          break;
+        }
+      }
+      if (!flag) {
+        setisPinAvail(false);
+        return false;
+      }
+      setisPinAvail(true);
+    }
+    if (addressData?.phone?.toString()?.length != 10) {
       return false;
     }
-    if (!addressData?.city) {
-      // Alert.alert('Please check');
-      // ErrorToast(toast, 'City field is required.');
-
-      return false;
-    }
-    if (!addressData?.pin_code) {
-      // Alert.alert(
-      //   'Please check',
-      //   ,
-      // );
-      // ErrorToast(toast, 'Pin code is required');
-
-      return false;
-    }
-    if (addressData?.phone?.length != 10) {
-      // Alert.alert(
-      //   'Please check',
-      //   ,
-      // );
-      // ErrorToast(toast, 'Mobile number is required and must be of 10 digit.');
-      return false;
-    }
-
     return true;
   }
 
   function addAddress() {
-    console.log(addressData);
+    // console.log(addressData);
+    let address = {...addressData};
+    for (let i = 0; i < allPin.length; i++) {
+      const el = allPin[i];
+      if (parseInt(addressData?.pin_code) == el?.label) {
+        address = {...address, pin_code: el.value};
+        break;
+      }
+    }
     setisLoading(true);
     try {
       axiosPost(
         'address',
-        addressData, // add a mongoid in state
+        address,
         data => {
           console.log(data);
           // Alert.alert('Success', );
@@ -493,24 +481,28 @@ const AddressModal = ({
     }
   }
   async function updateAddress() {
+    let addressToUpdate = {...addressData, address_id: address?._id};
+    for (let i = 0; i < allPin.length; i++) {
+      const el = allPin[i];
+      console.log(el);
+      if (parseInt(addressData?.pin_code) == el?.label) {
+        addressToUpdate = {...addressToUpdate, pin_code: el.value};
+        break;
+      }
+    }
+    console.log(addressToUpdate);
     setisLoading(true);
     try {
       let token = await AsyncStorage.getItem(dalsamarkandJwtToken);
-      let updateData = await axios.put(
-        'address',
-        {...addressData, address_id: address?._id},
-        {
-          headers: {
-            Authorization: token,
-          },
+      let updateData = await axios.put('address', addressToUpdate, {
+        headers: {
+          Authorization: token,
         },
-      );
+      });
       updateData = await updateData.data;
       setisLoading(false);
 
       if (updateData?.status_code == 1) {
-        // Alert.alert('Success', updateData?.mgs || updateData?.message);
-        // SuccessToast(toast, );
         setsuccessAlert({
           visible: true,
           message: updateData.mgs || updateData.message,
@@ -519,8 +511,6 @@ const AddressModal = ({
         setallAddress(updateData?.data?.items);
         setModalVisible(false);
       } else {
-        // Alert.alert('Fail', updateData?.mgs || updateData?.message);
-
         seterrorAlert({
           visible: true,
           message:
@@ -531,8 +521,6 @@ const AddressModal = ({
         });
       }
     } catch (error) {
-      // Alert.alert('Fail', error);
-      // ErrorToast(toast, error.message || error.error || JSON.stringify(error));
       seterrorAlert({
         visible: true,
         message: error.message || error.error || JSON.stringify(error),
@@ -575,7 +563,6 @@ const AddressModal = ({
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          // Alert.alert("Modal has been closed.");
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
@@ -625,14 +612,12 @@ const AddressModal = ({
                 placeholder="Landmark"
               />
               <PickerCompo
-                // showLabel="Time Slot"
-                // required
                 data={allCity}
                 selectedValue={addressData?.city}
                 onValueChange={val => {
                   // getallPin(val);
                   setaddressData(pre => {
-                    pre = {...pre, city: val};
+                    pre = {...pre, city: val, pin_code: ''};
                     setisFormValid(validform(pre));
                     return pre;
                   });
@@ -640,24 +625,34 @@ const AddressModal = ({
                 Placeholder="Select city"
                 noDataMassage="No city is found"
                 mode="dropdown"
+                grey
               />
               <View style={{height: 10}}></View>
-              <PickerCompo
-                // showLabel="Time Slot"
-                // required
-                data={allPin}
-                selectedValue={addressData?.pin_code}
-                onValueChange={val => {
+
+              <GreyInputBox
+                value={addressData?.pin_code?.toString()}
+                onChangeText={val => {
                   setaddressData(pre => {
                     pre = {...pre, pin_code: val};
                     setisFormValid(validform(pre));
                     return pre;
                   });
                 }}
-                Placeholder="Select Pin code"
-                noDataMassage="No pin code found"
-                mode="dropdown"
+                keyboardType="numeric"
+                maxLength={6}
+                placeholder="Pin Code"
               />
+              {!isPinAvail ? (
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: 'red',
+                    marginBottom: 3,
+                    fontFamily: FONT_FAMILY.baskervilleOldFace,
+                  }}>
+                  This pin code is not available for delivery.
+                </Text>
+              ) : null}
               <GreyInputBox
                 value={addressData?.phone?.toString()}
                 onChangeText={val => {
@@ -688,3 +683,17 @@ const AddressModal = ({
     </View>
   );
 };
+
+// <GreyInputBox
+// value={addressData?.phone?.toString()}
+// onChangeText={val => {
+//   setaddressData(pre => {
+//     pre = {...pre, phone: val};
+//     setisFormValid(validform(pre));
+//     return pre;
+//   });
+// }}
+// keyboardType="numeric"
+// maxLength={10}
+// placeholder="Mobile number"
+// />

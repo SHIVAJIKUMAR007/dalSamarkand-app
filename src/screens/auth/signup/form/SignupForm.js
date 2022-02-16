@@ -41,7 +41,6 @@ export default function SignupForm(props) {
   const toast = useToast();
   const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
   const [successAlert, setsuccessAlert] = useGlobal('successAlert');
-  const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
 
   function validateFormConti(registerData, toggleCheckBox) {
     let validEmailType = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -191,7 +190,7 @@ export default function SignupForm(props) {
     // }
   };
   return (
-    <ScrollView style={{minHeight: height}}>
+    <ScrollView>
       <View
         colors={[COLORS.PRIMARY, COLORS.SECONDARY]}
         style={styles.container}>

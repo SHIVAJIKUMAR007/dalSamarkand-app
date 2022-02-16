@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, Platform, Appearance} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {FONT_FAMILY} from '../constants/font-family';
 
 const PickerCompo = ({
   data,
@@ -12,6 +13,7 @@ const PickerCompo = ({
   noDataMassage,
   showLabel,
   mode,
+  grey,
 }) => {
   const colorScheme = Appearance.getColorScheme();
   return (
@@ -26,11 +28,16 @@ const PickerCompo = ({
       <View style={styles.pickerBorder}>
         <Picker
           mode={mode ? mode : 'dialog'}
-          style={{color: 'rgba(0,0,0,0.5)', backgroundColor: 'white'}}
+          style={{
+            color: 'rgba(0,0,0,0.5)',
+            backgroundColor: grey ? '#F2F2F2' : '#FFFFFF',
+          }}
           selectedValue={selectedValue}
           onValueChange={onValueChange}>
           {Placeholder ? (
             <Picker.Item
+              style={{fontFamily: FONT_FAMILY.baskervilleOldFace}}
+              fontFamily={FONT_FAMILY.baskervilleOldFace}
               color={
                 colorScheme == 'dark'
                   ? Platform.OS == 'ios'
@@ -38,7 +45,7 @@ const PickerCompo = ({
                     : 'white'
                   : 'black'
               }
-              label={Placeholder}
+              label={Placeholder.charAt(0).toUpperCase() + Placeholder.slice(1)}
               value=""
             />
           ) : null}
@@ -46,6 +53,7 @@ const PickerCompo = ({
             data?.map((d, i) => (
               <Picker.Item
                 key={i}
+                fontFamily={FONT_FAMILY.baskervilleOldFace}
                 color={
                   colorScheme == 'dark'
                     ? Platform.OS == 'ios'
@@ -57,13 +65,20 @@ const PickerCompo = ({
                     ? 'rgba(0,0,0,0.6)'
                     : 'black'
                 }
-                label={d.label + `${d.disable ? ' (Not available)' : ''}`}
+                label={
+                  d.label.charAt(0).toUpperCase() +
+                  d.label.slice(1) +
+                  `${d.disable ? ' (Not available)' : ''}`
+                }
                 value={d.value}
               />
             ))
           ) : (
             <Picker.Item
-              label={noDataMassage}
+              label={
+                noDataMassage.charAt(0).toUpperCase() + noDataMassage.slice(1)
+              }
+              fontFamily={FONT_FAMILY.baskervilleOldFace}
               value=""
               color={
                 colorScheme == 'dark'
@@ -92,12 +107,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     marginBottom: 5,
+    fontFamily: FONT_FAMILY.baskervilleOldFace,
   },
   textInput: {
     paddingHorizontal: 15,
     paddingHorizontal: Platform.OS === 'ios' ? 15 : 0,
     borderRadius: 10,
     marginBottom: 10,
+    fontFamily: FONT_FAMILY.baskervilleOldFace,
     borderColor: 'rgba(0,0,0,0.3)',
     borderWidth: 1,
     borderStyle: 'solid',
@@ -115,15 +132,15 @@ const styles = StyleSheet.create({
       ? {
           backgroundColor: 'white',
           borderRadius: 10,
-          paddingHorizontal: 15,
+          // paddingHorizontal: 15,
         }
       : {
-          borderColor: 'rgba(0,0,0,0.3)',
-          borderWidth: 1,
-          borderStyle: 'solid',
+          // borderColor: 'rgba(0,0,0,0.3)',
+          // borderWidth: 1,
+          // borderStyle: 'solid',
           backgroundColor: 'white',
-          borderRadius: 10,
-          paddingHorizontal: 15,
+          borderRadius: 20,
+          // paddingHorizontal: 15,
         },
   checkBox: {
     color: 'white',

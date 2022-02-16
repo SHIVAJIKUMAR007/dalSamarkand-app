@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  StatusBar,
   Image,
   TouchableOpacity,
   ScrollView,
@@ -45,13 +44,12 @@ export default function OtpVarification({navigation, route}) {
       setwarnAlert({
         visible: true,
         message:
-          'Please wait atleaset of 20 second, your request has been sent. ',
+          'Please wait atleaset of 30 second, your request has been sent. ',
       });
       return;
     }
 
     try {
-      ///// api is not working
       let res = await axios.post('auth/resend_otp', {
         phone: mobileNumber,
         code: otp,
@@ -62,7 +60,7 @@ export default function OtpVarification({navigation, route}) {
         setresendEnable(false);
         setTimeout(() => {
           setresendEnable(true);
-        }, 20000);
+        }, 30000);
         // AlertMsg(res.message);
         // SuccessToast(toast, res.message);
         setsuccessAlert({
@@ -153,13 +151,13 @@ export default function OtpVarification({navigation, route}) {
     }
   }
   return (
-    <ScrollView style={{minHeight: height}}>
+    <ScrollView>
       <View style={styles.container}>
-        <StatusBar
+        {/* <StatusBar
           translucent={true}
           backgroundColor={'transparent'}
           barStyle="dark-content"
-        />
+        /> */}
 
         <CustomHeader title={isLogin ? 'Login' : 'Register'} />
         <View style={styles.emptyContainer}>
