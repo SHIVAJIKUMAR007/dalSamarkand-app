@@ -8,10 +8,10 @@ export default function BrownBtn(props) {
   return (
     <View
       style={{
-        marginVertical: props.marginVertical ? props.marginVertical : 15,
-        marginHorizontal: 20,
+        marginVertical: props.marginVertical ? props.marginVertical : 0,
+        marginHorizontal: 8,
         zIndex: 0,
-        paddingHorizontal: 20,
+        paddingVertical: 10,
       }}>
       <TouchableOpacity
         disabled={props.disabled || props.isLoading}

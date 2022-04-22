@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Pressable,
 } from 'react-native';
 import CustomHeader from '../../../../components/custom-header';
 import styles from './style';
@@ -15,7 +16,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useGlobal} from 'reactn';
-import {axiosGet} from '../../../../axios';
+import {axiosGet, axiosPost} from '../../../../axios';
 import {FONT_FAMILY} from '../../../../constants/font-family';
 import {serverEndPoint} from '../../../../config';
 import moment from 'moment';
@@ -33,7 +34,6 @@ export default function OrderStatus(props) {
     axiosGet(
       'order/' + orderId,
       data => {
-        // console.log(data[0]?.cart, 'jdsjkfasdfddnfsdnfjj');
         setorderDetail(data[0]);
       },
       res => console.log(res),
@@ -145,9 +145,35 @@ export default function OrderStatus(props) {
 
 const RatingSystem = ({order}) => {
   const [rating, setrating] = useState(null);
+  useEffect(() => {
+    if (order?.rating) {
+      setrating(order?.rating);
+    }
+  }, [order?._id]);
+
+  async function rateIt(rate) {
+    if (rate) {
+      setrating(rate);
+      axiosPost(
+        'order/rate',
+        {order_id: order?._id, rating: rate},
+        res => {
+          console.log(res);
+        },
+        res => {
+          console.log(res);
+        },
+        res => {
+          console.log(res);
+        },
+        null,
+        null,
+      );
+    }
+  }
 
   return (
-    <>
+    <View>
       <Text style={[styles.heading, {marginHorizontal: 30, marginTop: 10}]}>
         Rate Us
       </Text>
@@ -161,49 +187,78 @@ const RatingSystem = ({order}) => {
           Rate your Experience
         </Text>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={() => setrating(pre => (pre == 1 ? null : 1))}>
+          <Pressable
+            onPress={() => {
+              if (!rating) rateIt(1);
+              //  setrating(pre => (pre == 1 ? null : 1))
+            }}>
             {rating && rating >= 1 ? (
               <Entypo name="star" size={25} color={COLORS.YELLOW} />
             ) : (
               <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
             )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setrating(pre => (pre == 2 ? null : 2))}>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              if (!rating) rateIt(2);
+              //  setrating(pre => (pre == 2 ? null : 2))
+            }}>
             {rating && rating >= 2 ? (
               <Entypo name="star" size={25} color={COLORS.YELLOW} />
             ) : (
               <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
             )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setrating(pre => (pre == 3 ? null : 3))}>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              if (!rating) rateIt(3);
+              //  setrating(pre => (pre == 3 ? null : 3))
+            }}>
             {rating && rating >= 3 ? (
               <Entypo name="star" size={25} color={COLORS.YELLOW} />
             ) : (
               <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
             )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setrating(pre => (pre == 4 ? null : 4))}>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              if (!rating) rateIt(4);
+              //  setrating(pre => (pre == 4 ? null : 4))
+            }}>
             {rating && rating >= 4 ? (
               <Entypo name="star" size={25} color={COLORS.YELLOW} />
             ) : (
               <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
             )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setrating(pre => (pre == 5 ? null : 5))}>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              if (!rating) rateIt(5);
+              // setrating(pre => (pre == 5 ? null : 5))
+            }}>
             {rating && rating >= 5 ? (
               <Entypo name="star" size={25} color={COLORS.YELLOW} />
             ) : (
               <Entypo name="star-outlined" size={25} color={COLORS.BLACK} />
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
-    </>
+      {/* <View style={{width: '100%'}}>
+        <TouchableOpacity
+          style={{
+            marginLeft: 'auto',
+            marginRight: 30,
+            paddingHorizontal: 15,
+            paddingVertical: 5,
+          }}>
+          <Text
+            style={{fontFamily: FONT_FAMILY.baskervilleOldFace, fontSize: 15}}>
+            Submit Rating
+          </Text>
+        </TouchableOpacity>
+      </View> */}
+    </View>
   );
 };
 

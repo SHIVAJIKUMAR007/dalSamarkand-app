@@ -6,8 +6,9 @@ var {width, height} = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: COLORS.WHITE,
-    flex: 1,
+    backgroundColor: COLORS.TRANSPARENT,
+    // flex: 1,
+    marginBottom: 150,
   },
 
   topBg: {

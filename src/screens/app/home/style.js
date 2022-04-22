@@ -168,6 +168,7 @@ export default StyleSheet.create({
   productImage: {
     height: width / 2 - 60,
     width: width / 2 - 30,
+    resizeMode: 'stretch',
   },
 
   productInfo: {

@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions, StatusBar} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 import {COLORS} from '../../../../constants/colors';
 import {FONT_FAMILY} from '../../../../constants/font-family';
 
@@ -8,7 +8,6 @@ export default StyleSheet.create({
   container: {
     backgroundColor: COLORS.WHITE,
     flex: 1,
-    justifyContent: 'space-between',
   },
 
   emptyContainer: {

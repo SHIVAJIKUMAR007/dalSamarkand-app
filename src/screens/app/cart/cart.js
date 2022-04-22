@@ -20,13 +20,10 @@ import {useGlobal} from 'reactn';
 import {ICONS} from '../../../constants/icons';
 import {axiosGet} from '../../../axios';
 import {ActivityIndicator} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-community/async-storage';
 import {dalsamarkandCartId} from '../../../constants/appConstant';
 import AlertMsg from '../../../components/alert-msg';
 import StoreStateMsg from '../../../components/StoreStateMsg';
-import {ErrorToast, infoToast} from '../../../components/CustmToast';
-import {useToast} from 'react-native-toast-notifications';
 import {serverEndPoint} from '../../../config';
 
 export default function Cart(props) {
@@ -35,17 +32,15 @@ export default function Cart(props) {
   const [checkout, setcheckout] = useState(null);
   const [isLoading, setisLoading] = useState(false);
   const [isUpdatingCart, setisUpdatingCart] = useState(false);
-  const toast = useToast();
-  const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
-  const [successAlert, setsuccessAlert] = useGlobal('successAlert');
   const [warnAlert, setwarnAlert] = useGlobal('warnAlert');
   const getUnauthCart = async () => {
     let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
-    // console.log(cartId, 'cartid in cart');
+    console.log(cartId, 'cartid in cart');
     if (cartId) {
       axiosGet(
         'cart/' + cartId,
         data => {
+          console.log(data);
           setcart(data?.items);
           setcheckout(data);
           setisLoading(false);
@@ -66,10 +61,13 @@ export default function Cart(props) {
     if (user)
       axiosGet(
         'cart',
-        data => {
+        async data => {
           console.log(data);
           setisLoading(false);
           if (isMounted) {
+            // let cartId = await AsyncStorage.getItem(dalsamarkandCartId);
+            // if (data?._id && cartId != data?._id)
+            //   await AsyncStorage.setItem(dalsamarkandCartId, data?._id);
             setcart(data?.items);
             setcheckout(data);
           }
@@ -152,7 +150,7 @@ export default function Cart(props) {
                     visible: true,
                     message: 'Please login to proceed further.',
                   });
-                  props.navigation.navigate('SignIn');
+                  props.navigation.navigate('SignIn', {goToCart: true});
                 }
               }}
             />
@@ -181,7 +179,7 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
 
   useEffect(() => {
     setcartItem(data?.productId);
-    console.log(data?.productId);
+    // console.log(data?.productId);
     setqty(data?.quantity);
     return () => {
       setcartItem(null);
@@ -257,16 +255,18 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
           />
         </View>
         <View style={styles.productInfoContainer}>
-          <View style={styles.qtyBtnContainer}>
+          <View style={styles.productNameContainer}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('ProductDetails', {
                   productId: cartItem?._id,
                 });
               }}>
-              <Text style={styles.productName}>{cartItem?.title}</Text>
+              <Text numberOfLines={2} style={styles.productName}>
+                {cartItem?.title}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               // style={{marginLeft: 'auto'}}
               onPress={() => removeItem()}>
               <MaterialIcons
@@ -274,11 +274,9 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
                 size={25}
                 color={COLORS.RED}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <View style={styles.qtyBtnContainer}>
-            <Text style={styles.productPrice}>Rs. {cartItem?.sale_price}</Text>
-
             <View style={styles.btnContainer}>
               <TouchableOpacity
                 style={styles.qtyBtn}
@@ -303,6 +301,8 @@ const CartItem = ({data, navigation, setisCartLoading, setcheckout}) => {
                 <Feather name="plus" color={COLORS.WHITE} size={10} />
               </TouchableOpacity>
             </View>
+
+            <Text style={styles.productPrice}>₹{cartItem?.sale_price}</Text>
           </View>
         </View>
       </View>

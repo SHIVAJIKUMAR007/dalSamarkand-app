@@ -10,6 +10,12 @@ import {useGlobal} from 'reactn';
 export default function CustomDrawerHeader(props) {
   const navigation = useNavigation();
   const [cart, setcart] = useGlobal('cart');
+  const getQuan = cart => {
+    let quan = 0;
+
+    cart.forEach(cart => (quan += cart.quantity));
+    return quan;
+  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -33,7 +39,7 @@ export default function CustomDrawerHeader(props) {
           {cart?.length ? (
             <View style={styles.qtyContainer}>
               <Text style={styles.qty}>
-                {cart?.length ? cart?.length : null}
+                {cart?.length ? getQuan(cart) : null}
               </Text>
             </View>
           ) : null}
@@ -45,7 +51,7 @@ export default function CustomDrawerHeader(props) {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 20,
+    // marginVertical: 20,
     marginTop: 30,
     flexDirection: 'row',
     padding: 20,

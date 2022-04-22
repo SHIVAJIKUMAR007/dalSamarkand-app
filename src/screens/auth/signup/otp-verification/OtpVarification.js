@@ -27,6 +27,8 @@ const {width, height} = Dimensions.get('window');
 
 export default function OtpVarification({navigation, route}) {
   let mobileNumber = route?.params?.mobileNumber;
+  const goToCart = route?.params?.goToCart; // goto cart if came here from cart
+
   let isLogin = route?.params?.isLogin;
   const [otp, setotp] = useState(null);
   const [user, setuser] = useGlobal('user');
@@ -115,7 +117,8 @@ export default function OtpVarification({navigation, route}) {
           setisSubmitting(false);
           setuser({_id: 1});
           navigation.popToTop();
-          navigation.navigate('HomeScreen');
+          if (goToCart) navigation.navigate('Cart');
+          else navigation.navigate('HomeScreen');
         },
         res => {
           seterrorAlert({

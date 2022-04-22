@@ -92,15 +92,23 @@ export default StyleSheet.create({
 
   productInfoContainer: {
     flex: 1,
-    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingLeft: 10,
     // paddingVertical: 5,
     paddingRight: 5,
   },
-
+  productNameContainer: {
+    flex: 1,
+    marginLeft: 5,
+    fontSize: 17,
+    fontFamily: FONT_FAMILY.baskervilleOldFace,
+    fontWeight: '400',
+  },
   qtyBtnContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
 
@@ -128,6 +136,7 @@ export default StyleSheet.create({
     fontSize: 18,
     fontFamily: FONT_FAMILY.baskervilleOldFace,
     color: COLORS.PRIMARY_LIGHT,
+    marginTop: 20,
   },
 
   btnContainer: {

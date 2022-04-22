@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
+  FlatList,
+  Dimensions,
 } from 'react-native';
 import styles from './style';
 import {ICONS} from '../../../../constants/icons';
@@ -25,6 +27,8 @@ import {useNavigation} from '@react-navigation/core';
 import {axiosGet} from '../../../../axios';
 import {addToCart, updateItemInCart} from '../../../../utils/cart';
 import {serverEndPoint} from '../../../../config';
+
+const {width} = Dimensions.get('window');
 
 export default function ProductList(props) {
   const scrollViewRef = useRef();
@@ -58,7 +62,7 @@ export default function ProductList(props) {
   }, []);
 
   return (
-    <ScrollView style={styles.container} ref={scrollViewRef}>
+    <>
       <StatusBar
         translucent={true}
         backgroundColor={'transparent'}
@@ -72,41 +76,38 @@ export default function ProductList(props) {
         resizeMethod="resize"
         style={styles.topBg}>
         <CustomDrawerHeader title="Dal Samarkand" />
-
-        <CustomHeaderBorder label={'Our Products'} />
-        {fetchingProduct ? (
-          <ActivityIndicator
-            style={{marginVertical: 50}}
-            color={COLORS.PRIMARY_LIGHT}
-            size="large"
+        <ScrollView style={styles.container} ref={scrollViewRef}>
+          <CustomHeaderBorder label={'Our Products'} />
+          {fetchingProduct ? (
+            <ActivityIndicator
+              style={{marginVertical: 50}}
+              color={COLORS.PRIMARY_LIGHT}
+              size="large"
+            />
+          ) : (
+            <>
+              <ScrollView horizontal style={{maxWidth: width}}>
+                <FlatList
+                  data={products}
+                  renderItem={(item, i) => (
+                    <OneProduct
+                      key={item?._id}
+                      data={item?.item}
+                      navigation={props.navigation}
+                    />
+                  )}
+                />
+              </ScrollView>
+            </>
+          )}
+          <Footer
+            onPress={() =>
+              scrollViewRef.current?.scrollTo({y: 0, animated: true})
+            }
           />
-        ) : (
-          <>
-            <View>
-              {products.map((data, i) => (
-                <OneProduct key={i} data={data} navigation={props.navigation} />
-              ))}
-            </View>
-
-            {/* <View style={styles.pageBtnContainer}>
-              <TouchableOpacity style={styles.pageBtn}>
-                <Feather name="arrow-left" color={'#9A9A9D'} size={16} />
-                <Text style={styles.pageBtnTxt}>Previous</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.pageBtn}>
-                <Text style={styles.pageBtnTxt}>Next</Text>
-                <Feather name="arrow-right" color={'#9A9A9D'} size={16} />
-              </TouchableOpacity>
-            </View> */}
-          </>
-        )}
+        </ScrollView>
       </ImageBackground>
-
-      <Footer
-        onPress={() => scrollViewRef.current?.scrollTo({y: 0, animated: true})}
-      />
-    </ScrollView>
+    </>
   );
 }
 
@@ -151,16 +152,25 @@ const OneProduct = props => {
         data?.title,
       );
     else
-      updateItemInCart(
+      addToCart(
         data?._id,
         qty,
-        setisLoading,
+        setcart,
         navigation,
         setuser,
-        null,
-        null,
-        setcart,
+        setisLoading,
+        data?.title,
       );
+    // updateItemInCart(
+    //   data?._id,
+    //   qty,
+    //   setisLoading,
+    //   navigation,
+    //   setuser,
+    //   null,
+    //   null,
+    //   setcart,
+    // );
   }
 
   return (
@@ -194,19 +204,23 @@ const OneProduct = props => {
             {data?.title}
             {/* (Order Lead Time- 24 Hours) */}
           </Text>
+          <Text style={styles.productName}>
+            {data?.short_desc}
+            {/* (Order Lead Time- 24 Hours) */}
+          </Text>
         </TouchableOpacity>
 
-        <View
-          style={[
-            styles.priceQtyContainer,
-            {justifyContent: isPresentInCart ? 'space-between' : 'center'},
-          ]}>
-          <View>
-            <Text style={styles.productDisPrice}>Rs. {data?.sale_price}</Text>
+        <View style={[styles.priceQtyContainer, {justifyContent: 'center'}]}>
+          <View style={{flexDirection: 'row'}}>
             <Text style={styles.productPrice}>Rs. {data?.mrp}</Text>
+            <View style={{width: 10}}></View>
+            <Text style={styles.productDisPrice}>Rs. {data?.sale_price}</Text>
           </View>
+        </View>
+
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           {isPresentInCart ? (
-            <View style={styles.btnContainer}>
+            <View style={[styles.btnContainer]}>
               <TouchableOpacity
                 style={styles.qtyBtn}
                 onPress={() => {
@@ -224,11 +238,8 @@ const OneProduct = props => {
               </TouchableOpacity>
             </View>
           ) : null}
-        </View>
-
-        <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
-            style={styles.borderBtn}
+            style={[styles.borderBtn, {width: isPresentInCart ? 112 : '100%'}]}
             disabled={isLoading}
             onPress={() => addItemToCart()}>
             {isLoading ? (
@@ -237,12 +248,12 @@ const OneProduct = props => {
               <Text style={styles.btnTxt}>Add to cart</Text>
             )}
           </TouchableOpacity>
-          <View style={{width: 20}} />
-          <TouchableOpacity
+          {/* <View style={{width: 20}} /> */}
+          {/* <TouchableOpacity
             style={styles.buyBtn}
             onPress={() => navigation.navigate('Cart')}>
             <Text style={styles.btnTxt}>Buy Now</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </ImageBackground>

@@ -23,6 +23,7 @@ import {useToast} from 'react-native-toast-notifications';
 
 const {width, height} = Dimensions.get('window');
 export default function SignIn(props) {
+  const goToCart = props?.route?.params?.goToCart; // goto cart if came here from cart
   const [phoneNo, setPhoneNo] = useState('');
   const [user, setuser] = useGlobal('user');
   const [token, settoken] = useGlobal('jwtToken');
@@ -63,6 +64,7 @@ export default function SignIn(props) {
           navigation.navigate('OtpSignup', {
             mobileNumber: phoneNo,
             isLogin: true,
+            goToCart: goToCart ? true : false,
           });
         },
         error => {
@@ -159,7 +161,11 @@ export default function SignIn(props) {
           <View style={styles.row}>
             <Text style={styles.tc2}>First Time ? </Text>
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Signup')}>
+              onPress={() =>
+                props.navigation.navigate('Signup', {
+                  goToCart: goToCart ? true : false,
+                })
+              }>
               <Text style={[styles.tc2, {color: 'yellow'}]}> Register</Text>
             </TouchableOpacity>
           </View>

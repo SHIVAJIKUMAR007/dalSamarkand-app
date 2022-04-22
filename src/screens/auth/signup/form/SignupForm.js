@@ -27,6 +27,7 @@ import {useToast} from 'react-native-toast-notifications';
 const {width, height} = Dimensions.get('window');
 
 export default function SignupForm(props) {
+  const goToCart = props?.route?.params?.goToCart; // goto cart if came here from cart
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const navigation = useNavigation();
   const [user, setuser] = useGlobal('user');
@@ -116,6 +117,7 @@ export default function SignupForm(props) {
           props.navigation.navigate('OtpSignup', {
             mobileNumber: registerData?.phone,
             isLogin: false,
+            goToCart: goToCart ? true : false,
           });
         },
         res => {
@@ -133,7 +135,7 @@ export default function SignupForm(props) {
           let error = res?.err?.keyValue;
           let errStr = '';
           for (let key in error) {
-            errStr += `${error[key]} is duplicate`;
+            errStr += `${error[key]} Already Exists!`;
           }
           // ErrorToast(toast, errStr);
           seterrorAlert({

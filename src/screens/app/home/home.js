@@ -30,6 +30,7 @@ import {serverEndPoint} from '../../../config';
 export default function HomeScreen(props) {
   const scrollViewRef = useRef();
   const [products, setproducts] = useState([]);
+  const [appBanners, setappBanners] = useState([]);
   const [user, setuser] = useGlobal('user');
   const navigation = useNavigation();
   const [cart, setcart] = useGlobal('cart');
@@ -102,6 +103,23 @@ export default function HomeScreen(props) {
         if (isMounted) setproducts(data);
       },
       null,
+      navigation,
+      setuser,
+    );
+    axiosGet(
+      'banners',
+      data => {
+        data = data.map(d => {
+          return {
+            id: d._id,
+            name: d.image,
+            uri: serverEndPoint + 'uploads/images/banners/' + d.image,
+          };
+        });
+        console.log(data);
+        if (isMounted) setappBanners(data);
+      },
+      error => console.log(error),
       navigation,
       setuser,
     );
@@ -183,7 +201,10 @@ export default function HomeScreen(props) {
         resizeMethod="auto"
         style={styles.productBg}>
         <View style={{alignItems: 'center'}}>
-          <ImageCarousel banner={products.slice(0, 4).map(p => p.images[0])} />
+          <ImageCarousel
+            banner={appBanners}
+            //  banner={products.slice(0, 4).map(p => p.images[0])}
+          />
         </View>
         <View style={styles.headingContainer}>
           <Text style={styles.available}>Available in Delhi/NCR only</Text>
@@ -193,7 +214,9 @@ export default function HomeScreen(props) {
         <View style={{alignItems: 'center'}}>
           <Image source={ICONS.TRUCK} style={{height: 35, width: 35}} />
           <Text style={styles.charges}>
-            ₹72 DELIVERY CHARGES . ORDERS TO BE PLACED 2 HRS PRIOR
+            {' '}
+            ORDER ONCE PLACED CANNOT BE CANCELLED OR REFUNDED, ORDERS TO BE
+            PLACED 2 HRS PRIOR
           </Text>
         </View>
 

@@ -17,7 +17,9 @@ export default function ImageCarousel(props) {
       sliderHeight={width}
       itemWidth={width - 75}
       data={banner}
-      renderItem={item => <RenderItem item={item} banner={banner} />}
+      renderItem={item => (
+        <RenderItem key={item?.item?.id} item={item} banner={banner} />
+      )}
       hasParallaxImages={true}
       autoplay={true}
       loop={true}
@@ -33,7 +35,9 @@ const RenderItem = ({item, banner}) => {
       <View style={styles.item} key={item.id}>
         <Image
           source={{
-            uri: serverEndPoint + 'uploads/images/products/' + item?.item?.name,
+            uri: item?.item?.uri
+              ? item?.item?.uri
+              : serverEndPoint + 'uploads/images/products/' + item?.item?.name,
           }}
           style={styles.image}
         />

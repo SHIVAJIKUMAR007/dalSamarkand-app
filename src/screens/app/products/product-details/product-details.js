@@ -90,102 +90,108 @@ export default function ProductDetails(props) {
         setisLoading,
       );
     else
-      updateItemInCart(
+      addToCart(
         product?._id,
         qty,
-        setisLoading,
+        setcart,
         props.navigation,
         setuser,
-        null,
-        null,
-        setcart,
+        setisLoading,
       );
   }
 
   return (
-    <ScrollView style={styles.container} ref={scrollViewRef}>
+    <>
       <ImageBackground
         resizeMethod="auto"
         source={IMAGES.PRODUCT_DETAILS_BG}
         style={styles.topBg}>
         <CustomDrawerHeader title="Dal Samarkand" />
-
-        <CustomHeaderBorder label={'Our Products'} />
-        {fetchingProduct ? (
-          <ActivityIndicator
-            style={{marginVertical: 50}}
-            color={COLORS.PRIMARY_LIGHT}
-            size="large"
-          />
-        ) : (
-          <>
-            <View style={{alignItems: 'center'}}>
-              <ProductsImageCarousel
-                banner={product?.images ? product?.images : []}
-              />
-            </View>
-
-            <View style={styles.productInfoContainer}>
-              <Text style={styles.productInfo}>
-                Dal Samarkand. A unit of Neetu Ujval Ahuja
-              </Text>
-              <Text style={styles.productName}>{product?.title}</Text>
-              <Text style={[styles.productInfo, {marginTop: 10}]}>
-                {product?.long_desc}
-              </Text>
-              <Text style={styles.productPrice}>Rs. {product?.sale_price}</Text>
-              {product?.mrp > product?.sale_price ? (
-                <Text style={styles.productMrp}>Rs. {product?.mrp}</Text>
-              ) : null}
-
-              <View style={{flexDirection: 'row'}}>
-                {isPresentInCart ? (
-                  <>
-                    <View style={styles.btnContainer}>
-                      <TouchableOpacity
-                        style={styles.qtyBtn}
-                        onPress={() => {
-                          if (qty > 1) setqty(pre => pre - 1);
-                        }}>
-                        <Feather name="minus" color={COLORS.BLACK} size={16} />
-                      </TouchableOpacity>
-                      <View style={styles.qtyBtn}>
-                        <Text style={styles.qty}> {qty}</Text>
-                      </View>
-                      <TouchableOpacity
-                        style={styles.qtyBtn}
-                        onPress={() => setqty(pre => pre + 1)}>
-                        <Feather name="plus" color={COLORS.BLACK} size={16} />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={{width: 40}} />
-                  </>
-                ) : null}
-                <TouchableOpacity
-                  style={styles.borderBtn}
-                  disabled={isLoading}
-                  onPress={() => addItemToCart()}>
-                  {isLoading ? (
-                    <ActivityIndicator color={COLORS.PRIMARY_LIGHT} />
-                  ) : (
-                    <Text style={styles.btnTxtDark}>Add to cart</Text>
-                  )}
-                </TouchableOpacity>
+        <ScrollView style={styles.container} ref={scrollViewRef}>
+          <CustomHeaderBorder label={'Our Products'} />
+          {fetchingProduct ? (
+            <ActivityIndicator
+              style={{marginVertical: 50}}
+              color={COLORS.PRIMARY_LIGHT}
+              size="large"
+            />
+          ) : (
+            <>
+              <View style={{alignItems: 'center'}}>
+                <ProductsImageCarousel
+                  banner={product?.images ? product?.images : []}
+                />
               </View>
 
-              <TouchableOpacity
+              <View style={styles.productInfoContainer}>
+                <Text style={styles.productInfo}>
+                  Dal Samarkand. A unit of Neetu Ujval Ahuja
+                </Text>
+                <Text style={styles.productName}>{product?.title}</Text>
+                <Text style={[styles.productInfo, {marginTop: 10}]}>
+                  {product?.long_desc}
+                </Text>
+                <Text style={styles.productPrice}>
+                  Rs. {product?.sale_price}
+                </Text>
+                {product?.mrp > product?.sale_price ? (
+                  <Text style={styles.productMrp}>Rs. {product?.mrp}</Text>
+                ) : null}
+
+                <View style={{flexDirection: 'row'}}>
+                  {isPresentInCart ? (
+                    <>
+                      <View style={styles.btnContainer}>
+                        <TouchableOpacity
+                          style={styles.qtyBtn}
+                          onPress={() => {
+                            if (qty > 1) setqty(pre => pre - 1);
+                          }}>
+                          <Feather
+                            name="minus"
+                            color={COLORS.BLACK}
+                            size={16}
+                          />
+                        </TouchableOpacity>
+                        <View style={styles.qtyBtn}>
+                          <Text style={styles.qty}> {qty}</Text>
+                        </View>
+                        <TouchableOpacity
+                          style={styles.qtyBtn}
+                          onPress={() => setqty(pre => pre + 1)}>
+                          <Feather name="plus" color={COLORS.BLACK} size={16} />
+                        </TouchableOpacity>
+                      </View>
+                      <View style={{width: 40}} />
+                    </>
+                  ) : null}
+                  <TouchableOpacity
+                    style={styles.borderBtn}
+                    disabled={isLoading}
+                    onPress={() => addItemToCart()}>
+                    {isLoading ? (
+                      <ActivityIndicator color={COLORS.PRIMARY_LIGHT} />
+                    ) : (
+                      <Text style={styles.btnTxtDark}>Add to cart</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+                {/* <TouchableOpacity
                 style={styles.buyBtn}
                 onPress={() => props.navigation.navigate('Cart')}>
                 <Text style={styles.btnTxt}>Buy Now</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+              </TouchableOpacity> */}
+              </View>
+            </>
+          )}
+          <Footer
+            onPress={() =>
+              scrollViewRef.current?.scrollTo({y: 0, animated: true})
+            }
+          />
+        </ScrollView>
       </ImageBackground>
-
-      <Footer
-        onPress={() => scrollViewRef.current?.scrollTo({y: 0, animated: true})}
-      />
-    </ScrollView>
+    </>
   );
 }

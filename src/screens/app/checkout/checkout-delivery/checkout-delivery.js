@@ -367,7 +367,6 @@ const AddressModal = ({
   update,
   allCity,
 }) => {
-  const toast = useToast();
   const [isLoading, setisLoading] = useState(false);
 
   const [errorAlert, seterrorAlert] = useGlobal('errorAlert');
@@ -470,13 +469,20 @@ const AddressModal = ({
             phone: null,
           });
         },
-        null,
-        null,
+        res => {
+          seterrorAlert(res.message || res.error || JSON.stringify(res));
+          setisLoading(false);
+        },
+        res => {
+          seterrorAlert(res.message || res.error || JSON.stringify(res));
+          setisLoading(false);
+        },
         navigation,
         setuser,
       );
     } catch (error) {
       console.log(error);
+      seterrorAlert(error.message || error.error || JSON.stringify(error));
       setisLoading(false);
     }
   }
@@ -519,6 +525,7 @@ const AddressModal = ({
             updateData.error ||
             JSON.stringify(updateData),
         });
+        setModalVisible(false);
       }
     } catch (error) {
       seterrorAlert({
@@ -683,17 +690,3 @@ const AddressModal = ({
     </View>
   );
 };
-
-// <GreyInputBox
-// value={addressData?.phone?.toString()}
-// onChangeText={val => {
-//   setaddressData(pre => {
-//     pre = {...pre, phone: val};
-//     setisFormValid(validform(pre));
-//     return pre;
-//   });
-// }}
-// keyboardType="numeric"
-// maxLength={10}
-// placeholder="Mobile number"
-// />

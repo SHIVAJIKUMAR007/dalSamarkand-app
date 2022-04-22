@@ -12,7 +12,8 @@ const COLORS = {
   GREY: '#808080',
   DARK_GREY: '#404040',
   TRANSPARENT_BLACK: 'rgba(0, 0, 0, 0.25)',
-  TRANSPARENT_BLACK: 'rgba(256, 256, 256, 0.45)',
+  TRANSPARENT: 'rgba(0, 0, 0, 0)',
+  // TRANSPARENT_BLACK: 'rgba(256, 256, 256, 0.45)',
   GREEN: '#06BEA8',
 };
 

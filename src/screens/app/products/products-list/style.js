@@ -6,8 +6,9 @@ var {width, height} = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: COLORS.WHITE,
-    flex: 1,
+    backgroundColor: COLORS.TRANSPARENT,
+    marginBottom: 150,
+    // flex: 1,
   },
 
   topBg: {
@@ -43,7 +44,7 @@ export default StyleSheet.create({
   },
 
   productPrice: {
-    fontSize: 12,
+    fontSize: 15,
     fontFamily: FONT_FAMILY.bellefair,
     color: COLORS.WHITE,
     textDecorationLine: 'line-through',
@@ -93,7 +94,7 @@ export default StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    // flex: 1,
   },
   buyBtn: {
     height: 40,

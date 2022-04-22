@@ -26,10 +26,10 @@ function err_handler(error_msg, url) {
 
 function unknown_err_handler(response, url) {
   console.log(response, url, 'sdjfk');
-  Alert.alert(
-    'Error!',
-    response?.message ? response.message : 'Somthing when wrong.',
-  );
+  // Alert.alert(
+  //   'Error!',
+  //   response?.message ? response.message : 'Somthing when wrong.',
+  // );
 }
 
 function success_handler({message}) {
